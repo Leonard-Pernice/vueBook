@@ -1,0 +1,120 @@
+
+div.questlogborder {
+    background-color: #DDEBF7;
+    border: 10px solid #1F4E78;
+    width: 50%;
+    margin: auto;
+}
+
+.questlog {
+    display: flex;
+}
+
+.questlist {
+    width: 20%;
+    overflow-y: scroll;
+    height: 60vh;
+    overflow-x: visible;
+    font-size: 18px;
+    padding: 5px;
+    margin: none;
+    margin-right: 0;
+    min-height: -webkit-min-content;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: lightgrey;
+}
+
+.questdetails {
+    flex: 1;
+    height: 60vh;
+    align-content: start;
+    text-align: center;
+    font-size: 18px;
+    border-left: 2px solid #ffffff;
+    padding: 1%;
+    margin: 1%;
+}
+
+.questbutton {
+    width: 100%;
+    display: block;
+    background: rgba(6, 36, 172, 0);
+    color: #ffffff;
+    text-shadow:
+    0 0 2px rgba(202,228,225,0.92),
+    0 0 10px rgba(202,228,225,0.34),
+    0 0 4px rgba(30,132,242,0.52),
+    /* 0 0 7px rgba(30,132,242,0.92),
+    0 0 11px rgba(30,132,242,0.78), */
+    0 0 16px rgba(30,132,242,0.92);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    border: none;
+    border-radius: 3px;
+    font-weight: bold;
+    text-align: center;
+    height: auto;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 1.5em;
+    position: relative;
+    left: -2em;
+}
+
+.questbutton:hover {
+    background-color: #001F5B;
+}
+
+.questbutton:active {
+    background-color: #3084CA;
+}
+
+/* .questbutton::before {
+    content: url(../img/icons/top2.svg);
+} */
+
+.questbutton::after {
+    content: url(../img/icons/smalltopbar2.svg);
+    position: absolute;
+    bottom: -0.5em;
+    right: 21%;
+}
+
+p.questtext {
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;
+    padding: 10px;
+}
+
+.qcell {
+    content:'';
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: none;
+    height:inherit;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+tr.q {
+    height: 10em;
+}

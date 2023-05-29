@@ -1,0 +1,142 @@
+
+div.pactMain {
+    height: 100%;
+    background-image: radial-gradient(circle at center, #007304, #000);
+    border: 1px solid;
+    border-image: url(../img/icons/topbar1.svg);
+    border-image-width: auto;
+    border-image-slice: 100;
+    position: relative;
+    /* z-index: -2; */
+}
+
+div.pactMain::before {
+    content:url(../img/icons/narrowtop2.svg);
+    height: auto;
+    width: auto;
+    display: block;
+    position: absolute;
+    top: -2em;
+    left: 43.71%;
+}
+
+.pactBorder {
+    border: 2em solid;
+    /* border-radius: 1%; */
+    border-image: radial-gradient(circle at center, #007304 30%, #ffffff 80%) 100;
+    width: 80%;
+    height: auto;
+    margin: 0 auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.pactText {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    padding: 5%;
+    color: #fff;
+    text-shadow: 
+    0 0 2px #FFF, 
+    0 0 5px #00B306, 
+    0 0 8px #00DB07, 
+    0 0 12px #00F208;
+}
+
+.pactHead {
+    width: 100%;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 2em;
+    font-weight: bold;
+    position: relative;
+    text-align: center;
+    margin-top: 0.5em;
+    margin-bottom: 2.7em;
+}
+
+.pactHead::before {
+    content: url(../img/icons/bottom1.svg);
+    position: absolute;
+    transform: rotate(90deg) scale(1);
+    left: 0;
+}
+
+.pactHead::after {
+    content: url(../img/icons/bottom1.svg);
+    position: absolute;
+    transform: rotate(270deg) scale(1);
+    right: 0;
+}
+
+.pactWarning {
+    text-align: center;
+    font-size: 1em;
+    padding-top: 1.2em;
+    padding-bottom: 1.2em;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+}
+
+.pactContainer {
+    flex: 1;
+}
+
+.pactOption1 {
+    content: url(../img/icons/cblau3.png);
+    position: relative;
+    transform: scale(0.8);
+}
+
+.pactContainer[datatooltip] {
+    position: relative;
+}
+
+.pactContainer[datatooltip]::after {
+    content: attr(datatooltip);
+    background-color: #007304;
+    width: 40vh;
+    text-align: center;
+    white-space: pre-wrap;
+    display: block;
+    position: absolute;
+    padding: 1em;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 
+    0 0 2px #FFF, 
+    0 0 5px #00B306, 
+    0 0 8px #00DB07, 
+    0 0 12px #000;
+    border: 2px solid #00F208;
+    border-radius: 5px;
+    font-size: 1em;
+    left: 0;
+    bottom: 0;
+    transform: scale(0);
+}
+
+.pactContainer[datatooltip]:hover::after {
+    transform: scale(1);
+    left: -25%;
+    bottom: 24%;
+    z-index: 4;
+}
+
+.pactOption2 {
+    content: url(../img/icons/clila3.png);
+    transform: scale(0.8);
+}
+
+.pactMid {
+    content: url(../img/icons/cweiss2.png);
+    transform: scale(0.8);
+}
+
+.pactOption3 {
+    content: url(../img/icons/cgelb3.png);
+    transform: scale(0.8);
+}
+
+.pactOption4 {
+    content: url(../img/icons/crot3.png);
+    transform: scale(0.8);
+}

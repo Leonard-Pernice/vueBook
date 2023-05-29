@@ -1,0 +1,15 @@
+@tailwind base;
+
+@tailwind components;
+
+.iconContainer {
+    @apply flex self-center mx-auto my-0 border-x border-y border-slate-400 p-2
+}
+
+@tailwind utilities;
+
+@layer base {
+    html {
+      font-family: Verdana;
+    }
+}

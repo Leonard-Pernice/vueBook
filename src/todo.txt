@@ -1,0 +1,129 @@
+System
+  x create button to upload chapter in json format
+    x adapt the function to account for kill syntax and other events:
+      o introduce character/player
+      o include "times" functionality for multi kills, multi skill usage etc.
+      o delete visiblity changes... those are stupid anyway. Right?
+    x create the jsons for the initialization of kale's character -> this should be inside the chapter html / json
+      o initialize monster?
+      o initialize paragon
+      o initialize pact
+  o create session info to load last state when user logs in and such
+    o create function inside the respective view to post this chapter to django
+  x create django models and serializers for all the character variables, quests, npcs, etc.
+    o stats
+      o implement stat maximum percentile
+      o create models for "human", "elf", male, female, etc.
+    o paragon stuff
+    o pact stuff
+    o etc.
+  o create post methods to import chapters
+    o create post methods to create new 
+      o adapt CRUD structure to all of these (get List, post create, put update, delete) + their URL patterns
+        o differentiate
+          o real updates (creation of new entries) and 
+          o meta updates (changing data of existing entries) => adjust functions to update full entry
+      o create vue templates and components that list these for easy overview and implement buttons to dynamically call changes
+        o components should include input fields for all the relevant information (e.g. character: name, age, gender, etc.)
+  o create django view to export a list of all chapters to link them to the navigation menu via v-for
+  o create functions in loaded() method or whatever it is to jump back to last position after switch
+  o EVENT LOADING
+    o whenever an event is scrolled past, the function just goes through all the end points in the chapter JSON and loads the ones closest to the respective referenceToLastRelevantEvent
+    o the topnav should be hidden after a dynamic distance value dependent on the users screen size, not a flat value
+  o think about mobile implementations?
+  o create loading icon for signaling when page is still loading
+    o scrolling animation to last pos when loading is done
+  o hide scrollbar in mobile view
+  o (maybe not) change all the views to components => keepalive + dynamic components via :is=""
+  o get the chapter selection navigation bar working
+  o create buttons for prev and next chapter
+  o create component for chapter loading
+  o create landing page
+  o create settings page / menu
+  o implement darkmode?
+    o change from dark background (game world) to white background (real world)
+  o login token and such should probably go into cookies, but I've no clue how to make that secure with httponly=true...
+
+story
+  x killmsg should include the name of the monster/person/being killed
+
+Game
+o character (includes monsters)
+    x status (player / citizen / monster / bond)
+    x skill
+    - spell
+    x stat
+    x paragon
+    o equipment
+    o inventory
+    x reputation (npcs / fractions / races / gods)
+o quest + achievemment
+    x create a quest/achievement database
+    o create code to add a new quest to the database 
+    o create code to request a quest from the database
+    o build functionality to differentiate between 1 or 2 rewards/choices
+o item
+o trading / auction
+
+-------------------------------------------------------------------------------------------------
+
+Game functions:
+data
+    creation
+        o character creation
+        o npc creation
+        o monster creation
+        o bonded creation
+        o quest
+        o achievement
+        o item
+    scroller: 
+        when a chapter is loaded, the initial state is generated and all events and...
+            characters are loaded or calculated and saved in a local (localStorage Object) data base to be accessed...
+            at the respective scrolling event. 
+        when scrolling down, each event loads a data entry with the respective ID. 
+        when scrolling up, each event loads a data entry with the respective ID. 
+    save
+        o save character
+        o save quest
+        o save achievement
+    load (based on change?)
+        o load character
+        o load quest
+        o load achievement
+
+character related
+    o HP change (character specific!)
+    o MP change (character specific!)
+    o AP change (character specific!)
+    o skill used (include difficulty)
+    o spell used (include difficulty)
+    o stat exp (include difficulty)
+    o point spent (paragon / stat / skill / spell / evolution / ...)
+    o level up (include milestone => lvl 10 paragon, lvl 25 evolution, etc.)
+    o bonding
+
+exp related
+    o exp gain
+    o kill
+    quest
+        o quest offer
+        o quest accept
+        o quest reject
+        o quest objective complete
+        o quest turn in
+        o quest reward
+    o achievement
+    sex
+        o start
+        o sp gain
+        o special action
+        o round won / lost
+        o combo (?)
+        o stop
+
+interactions
+    o item drop
+    o looting
+    o buy and sell
+    o reputation change

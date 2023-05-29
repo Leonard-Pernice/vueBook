@@ -1,0 +1,32 @@
+PASSWORD SUDO: asdasd
+
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+before, using nvm 19.3.0
+installing nvm 20.0.0
+  nvm install 20.0.0
+  nvm use 20.0.0
+
+  npm create vue@3
+
+  cd book
+  npm install
+  npm run format
+  npm run dev
+
+  npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+
+  npm i @vueuse/core
+
+  npm i @floating-ui/dom
+
+python shit...
+  install anaconda via wget the file and then installing it
+  create new env
+  init conda
+  make sure its added to path
+  restart terminal
+  activate new env
+  pip install the dependencies
+  
+  
