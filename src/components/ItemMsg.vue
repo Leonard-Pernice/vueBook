@@ -79,6 +79,7 @@ const colorBreakPoints = {
   broken: 'bg-red-500'
 }
 
+
 const relevantItem = findEvent(chapterStore.items, props.p.id)
 const rarityColor = ref(rarities[relevantItem.rarity])
 const durability = ref(relevantItem.durability)

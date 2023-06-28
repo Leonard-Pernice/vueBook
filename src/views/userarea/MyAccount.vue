@@ -209,33 +209,33 @@ const logEntries = async (index = 0) => {
         }
         initializeItem(formData, index)
         break
-      case 'inventoryInitialization':
-        formData = {
-          chapter: chapter.value,
-          text: '',
-          attributes: 'inventory',
-          textorder: index + 0.63
-        }
-        initializeInventory(formData, index)
-        break
-      case 'slotInitialization':
-        formData = {
-          chapter: chapter.value,
-          text: '',
-          attributes: 'slot',
-          textorder: index + 0.635
-        }
-        initializeSlot(formData, index)
-        break
-      case 'equipmentInitialization':
-        formData = {
-          chapter: chapter.value,
-          text: '',
-          attributes: 'equipment',
-          textorder: index + 0.635
-        }
-        initializeEquipment(formData, index)
-        break
+      // case 'inventoryInitialization':
+      //   formData = {
+      //     chapter: chapter.value,
+      //     text: '',
+      //     attributes: 'inventory',
+      //     textorder: index + 0.63
+      //   }
+      //   initializeInventory(formData, index)
+      //   break
+      // case 'slotInitialization':
+      //   formData = {
+      //     chapter: chapter.value,
+      //     text: '',
+      //     attributes: 'slot',
+      //     textorder: index + 0.635
+      //   }
+      //   initializeSlot(formData, index)
+      //   break
+      // case 'equipmentInitialization':
+      //   formData = {
+      //     chapter: chapter.value,
+      //     text: '',
+      //     attributes: 'equipment',
+      //     textorder: index + 0.635
+      //   }
+      //   initializeEquipment(formData, index)
+      //   break
       default:
         formData = {
           chapter: chapter.value,
@@ -1031,66 +1031,37 @@ function initializeItem (formData, index) {
   axios.post('api/v1/create-eventparagraph/', formData).then(response => {
     console.log(`Posted Item Creation Reference Paragraph at Index: ${index + 0.61}.`)
     const referenceParagraph = response.data.id
-    console.log('Creating new Item: ', options.name)
-    const newItemFormData = {
-      name: options.name,
-      chapter: chapter.value,
-      referenceParagraph: referenceParagraph,
-      typ: options.typ,
-      slot: options.slot,
-      quantity: parseInt(options.quantity),
-      creator: options.creator,
-      rarity: options.rarity,
-      appearance: options.appearance,
-      details: options.details,
-      attributes: options.attributes,
-      charge: parseInt(options.charge),
-      durability: parseInt(options.durability)
-    }
-    axios.post('api/v1/create-item/', newItemFormData).then(response => {
-      const newItem = response.data
-      console.log('Created new Item: ', newItem.name)
-      if (text !== '') {
-        const additionalParagraphFormData = {
-          chapter: chapter.value,
-          text: text,
-          textorder: index + 0.0
-        }
-        console.log('Posting additional text paragraph.')
-        axios.post('api/v1/create-paragraph/', additionalParagraphFormData).then(response => {
-          console.log(`Posted additional paragraph ${response.data} at index: ${index + 0.0}. Now posting at ${index + 1}`)
-          logEntries(index + 1)
-        }).catch(error => { console.log(error) })
-      } else {
-        console.log(`Now posting at ${index + 1}`)
-        logEntries(index + 1)
-      }
-    }).catch(error => { console.log(error) })
-  }).catch(error => { console.log(error) })
-}
-
-// initializeInventory
-function initializeInventory (formData, index) {
-  const text = entries.value.content[index][1]
-  const options = entries.value.content[index][0]
-  console.log('Posting a Inventory Creation event paragraph.')
-  axios.post('api/v1/create-eventparagraph/', formData).then(response => {
-    console.log(`Posted Inventory Creation Reference Paragraph at Index: ${index + 0.63}.`)
-    const referenceParagraph = response.data.id
-    console.log(options)
-    axios.get('api/v1/create-player/', { params: { chapter: chapter.value, name: options.player, paragraph: referenceParagraph } }).then(response => {
-      const relevantPlayer = response.data
-      console.log('Creating new Inventory for: ', options.player)
-      const newInventoryFormData = {
-        player: relevantPlayer.id,
+    console.log('Retrieving relevant Character...')
+    const name = options.belongsTo.split(' ')
+    console.log('Name is: ', name)
+    axios.get('api/v1/create-character/', { params: { name: options.belongsTo.split(' ')[0], lastname: options.belongsTo.split(' ')[1], chapter: chapter.value, paragraph: referenceParagraph } }).then(response => {
+      const referenceCharacter = response.data[0]
+      console.log('Relevant character is: ', referenceCharacter)
+      console.log('Creating new Item: ', options.name)
+      const isEquipped = options.isEquipped == 'True' ? true : false
+      const inInventory = !isEquipped
+      const newItemFormData = {
+        name: options.name,
+        chapter: chapter.value,
         referenceParagraph: referenceParagraph,
-        referenceToLastRelevantEvent: 0,
-        description: options.description,
-        slots: options.slots
+        typ: options.typ,
+        slot: options.slot,
+        quantity: parseInt(options.quantity),
+        creator: options.creator,
+        rarity: options.rarity,
+        appearance: options.appearance,
+        details: options.details,
+        attributes: options.attributes,
+        charge: parseInt(options.charge),
+        durability: parseInt(options.durability),
+        belongsTo: referenceCharacter.id,
+        isEquipped: isEquipped,
+        inInventory: inInventory,
+        sellValue: parseInt(options.sellValue)
       }
-      axios.post('api/v1/create-inventory/', newInventoryFormData).then(response => {
-        const newInventory = response.data
-        console.log('Created new Inventory: ', newInventory)
+      axios.post('api/v1/create-item/', newItemFormData).then(response => {
+        const newItem = response.data
+        console.log('Created new Item: ', newItem.name)
         if (text !== '') {
           const additionalParagraphFormData = {
             chapter: chapter.value,
@@ -1111,97 +1082,139 @@ function initializeInventory (formData, index) {
   }).catch(error => { console.log(error) })
 }
 
-// initializeSlot
-function initializeSlot (formData, index) {
-  const text = entries.value.content[index][1]
-  const options = entries.value.content[index][0]
-  console.log('Posting a Slot Creation event paragraph.')
-  axios.post('api/v1/create-eventparagraph/', formData).then(response => {
-    console.log(`Posted Slot Creation Reference Paragraph at Index: ${index + 0.635}.`)
-    const referenceParagraph = response.data.id
-    console.log('Retrieving inventory of player ', options.player)
-    axios.get('api/v1/create-inventory/', { params: { chapter: chapter.value, player: options.player, paragraph: referenceParagraph } }).then(response => {
-      const relevantInventory = response.data
-      console.log(relevantInventory)
-      console.log('Retrieving item instance of: ', options.item)
-      axios.get('api/v1/create-item', { params: { chapter: chapter.value, itemName: options.item, paragraph: referenceParagraph } }).then(response => {
-        const relevantItem = response.data
-        console.log(relevantItem)
-        console.log('Creating new Slot in inventory with ', relevantItem.name)
-        const newSlotFormData = {
-          inventory: relevantInventory.id,
-          referenceParagraph: referenceParagraph,
-          referenceToLastRelevantEvent: 0,
-          item: relevantItem.id
-        }
-        axios.post('api/v1/create-slot/', newSlotFormData).then(response => {
-          console.log('Posted new slot: ', response.data)
-          if (text !== '') {
-            const additionalParagraphFormData = {
-              chapter: chapter.value,
-              text: text,
-              textorder: index + 0.0
-            }
-            console.log('Posting additional text paragraph.')
-            axios.post('api/v1/create-paragraph/', additionalParagraphFormData).then(response => {
-              console.log(`Posted additional paragraph ${response.data} at index: ${index + 0.0}. Now posting at ${index + 1}`)
-              logEntries(index + 1)
-            }).catch(error => { console.log(error) })
-          } else {
-            console.log(`Now posting at ${index + 1}`)
-            logEntries(index + 1)
-          }
-        }).catch(error => { console.log(error) })
-      })
-    }).catch(error => { console.log(error) })
-  }).catch(error => { console.log(error) })
-}
+// // initializeInventory
+// function initializeInventory (formData, index) {
+//   const text = entries.value.content[index][1]
+//   const options = entries.value.content[index][0]
+//   console.log('Posting a Inventory Creation event paragraph.')
+//   axios.post('api/v1/create-eventparagraph/', formData).then(response => {
+//     console.log(`Posted Inventory Creation Reference Paragraph at Index: ${index + 0.63}.`)
+//     const referenceParagraph = response.data.id
+//     console.log(options)
+//     axios.get('api/v1/create-player/', { params: { chapter: chapter.value, name: options.player, paragraph: referenceParagraph } }).then(response => {
+//       const relevantPlayer = response.data
+//       console.log('Creating new Inventory for: ', options.player)
+//       const newInventoryFormData = {
+//         player: relevantPlayer.id,
+//         referenceParagraph: referenceParagraph,
+//         referenceToLastRelevantEvent: 0,
+//         description: options.description,
+//         slots: options.slots
+//       }
+//       axios.post('api/v1/create-inventory/', newInventoryFormData).then(response => {
+//         const newInventory = response.data
+//         console.log('Created new Inventory: ', newInventory)
+//         if (text !== '') {
+//           const additionalParagraphFormData = {
+//             chapter: chapter.value,
+//             text: text,
+//             textorder: index + 0.0
+//           }
+//           console.log('Posting additional text paragraph.')
+//           axios.post('api/v1/create-paragraph/', additionalParagraphFormData).then(response => {
+//             console.log(`Posted additional paragraph ${response.data} at index: ${index + 0.0}. Now posting at ${index + 1}`)
+//             logEntries(index + 1)
+//           }).catch(error => { console.log(error) })
+//         } else {
+//           console.log(`Now posting at ${index + 1}`)
+//           logEntries(index + 1)
+//         }
+//       }).catch(error => { console.log(error) })
+//     }).catch(error => { console.log(error) })
+//   }).catch(error => { console.log(error) })
+// }
 
-// initializeEquipment
-function initializeEquipment (formData, index) {
-  const text = entries.value.content[index][1]
-  const options = entries.value.content[index][0]
-  console.log('Posting a Equipment Creation event paragraph.')
-  axios.post('api/v1/create-eventparagraph/', formData).then(response => {
-    console.log(`Posted Equipment Creation Reference Paragraph at Index: ${index + 0.63}.`)
-    // Problem: die Felder sollten nicht undefined sein, sondern später belegt werden. Dafür bräuchte ich
-    // models, serializer, view, signals, etc. für alle equipment slots einzeln.
-    // BEFORE CONTINUING WITH THIS:
-    // ensure that the design of the database and character/player structure as exported from database
-    // to chapter works as intended. => create the functions to populate player sheets etc according to
-    // scroll behavior!
-    const referenceParagraph = response.data.id
-    axios.get('api/v1/create-player/', { params: { chapter: chapter.value, name: options.player, paragraph: referenceParagraph } }).then(response => {
-      const relevantPlayer = response.data
-      console.log('Creating new Equipment for: ', options.player)
-      const newInventoryFormData = {
-        player: relevantPlayer.id,
-        referenceParagraph: referenceParagraph,
-        description: options.description,
-        slots: options.slots
-      }
-      axios.post('api/v1/create-inventory/', newInventoryFormData).then(response => {
-        const newInventory = response.data
-        console.log('Created new Inventory: ', newInventory)
-        if (text !== '') {
-          const additionalParagraphFormData = {
-            chapter: chapter.value,
-            text: text,
-            textorder: index + 0.0
-          }
-          console.log('Posting additional text paragraph.')
-          axios.post('api/v1/create-paragraph/', additionalParagraphFormData).then(response => {
-            console.log(`Posted additional paragraph ${response.data} at index: ${index + 0.0}. Now posting at ${index + 1}`)
-            logEntries(index + 1)
-          }).catch(error => { console.log(error) })
-        } else {
-          console.log(`Now posting at ${index + 1}`)
-          logEntries(index + 1)
-        }
-      }).catch(error => { console.log(error) })
-    }).catch(error => { console.log(error) })
-  }).catch(error => { console.log(error) })
-}
+// // initializeSlot
+// function initializeSlot (formData, index) {
+//   const text = entries.value.content[index][1]
+//   const options = entries.value.content[index][0]
+//   console.log('Posting a Slot Creation event paragraph.')
+//   axios.post('api/v1/create-eventparagraph/', formData).then(response => {
+//     console.log(`Posted Slot Creation Reference Paragraph at Index: ${index + 0.635}.`)
+//     const referenceParagraph = response.data.id
+//     console.log('Retrieving inventory of player ', options.player)
+//     axios.get('api/v1/create-inventory/', { params: { chapter: chapter.value, player: options.player, paragraph: referenceParagraph } }).then(response => {
+//       const relevantInventory = response.data
+//       console.log(relevantInventory)
+//       console.log('Retrieving item instance of: ', options.item)
+//       axios.get('api/v1/create-item', { params: { chapter: chapter.value, itemName: options.item, paragraph: referenceParagraph } }).then(response => {
+//         const relevantItem = response.data
+//         console.log(relevantItem)
+//         console.log('Creating new Slot in inventory with ', relevantItem.name)
+//         const newSlotFormData = {
+//           inventory: relevantInventory.id,
+//           referenceParagraph: referenceParagraph,
+//           referenceToLastRelevantEvent: 0,
+//           item: relevantItem.id
+//         }
+//         axios.post('api/v1/create-slot/', newSlotFormData).then(response => {
+//           console.log('Posted new slot: ', response.data)
+//           if (text !== '') {
+//             const additionalParagraphFormData = {
+//               chapter: chapter.value,
+//               text: text,
+//               textorder: index + 0.0
+//             }
+//             console.log('Posting additional text paragraph.')
+//             axios.post('api/v1/create-paragraph/', additionalParagraphFormData).then(response => {
+//               console.log(`Posted additional paragraph ${response.data} at index: ${index + 0.0}. Now posting at ${index + 1}`)
+//               logEntries(index + 1)
+//             }).catch(error => { console.log(error) })
+//           } else {
+//             console.log(`Now posting at ${index + 1}`)
+//             logEntries(index + 1)
+//           }
+//         }).catch(error => { console.log(error) })
+//       })
+//     }).catch(error => { console.log(error) })
+//   }).catch(error => { console.log(error) })
+// }
+
+// // initializeEquipment
+// function initializeEquipment (formData, index) {
+//   const text = entries.value.content[index][1]
+//   const options = entries.value.content[index][0]
+//   console.log('Posting a Equipment Creation event paragraph.')
+//   axios.post('api/v1/create-eventparagraph/', formData).then(response => {
+//     console.log(`Posted Equipment Creation Reference Paragraph at Index: ${index + 0.63}.`)
+//     // Problem: die Felder sollten nicht undefined sein, sondern später belegt werden. Dafür bräuchte ich
+//     // models, serializer, view, signals, etc. für alle equipment slots einzeln.
+//     // BEFORE CONTINUING WITH THIS:
+//     // ensure that the design of the database and character/player structure as exported from database
+//     // to chapter works as intended. => create the functions to populate player sheets etc according to
+//     // scroll behavior!
+//     const referenceParagraph = response.data.id
+//     axios.get('api/v1/create-player/', { params: { chapter: chapter.value, name: options.player, paragraph: referenceParagraph } }).then(response => {
+//       const relevantPlayer = response.data
+//       console.log('Creating new Equipment for: ', options.player)
+//       const newInventoryFormData = {
+//         player: relevantPlayer.id,
+//         referenceParagraph: referenceParagraph,
+//         description: options.description,
+//         slots: options.slots
+//       }
+//       axios.post('api/v1/create-inventory/', newInventoryFormData).then(response => {
+//         const newInventory = response.data
+//         console.log('Created new Inventory: ', newInventory)
+//         if (text !== '') {
+//           const additionalParagraphFormData = {
+//             chapter: chapter.value,
+//             text: text,
+//             textorder: index + 0.0
+//           }
+//           console.log('Posting additional text paragraph.')
+//           axios.post('api/v1/create-paragraph/', additionalParagraphFormData).then(response => {
+//             console.log(`Posted additional paragraph ${response.data} at index: ${index + 0.0}. Now posting at ${index + 1}`)
+//             logEntries(index + 1)
+//           }).catch(error => { console.log(error) })
+//         } else {
+//           console.log(`Now posting at ${index + 1}`)
+//           logEntries(index + 1)
+//         }
+//       }).catch(error => { console.log(error) })
+//     }).catch(error => { console.log(error) })
+//   }).catch(error => { console.log(error) })
+// }
 
 // initializeCurrency
 // initializeParagon

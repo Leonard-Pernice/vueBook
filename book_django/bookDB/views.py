@@ -474,6 +474,12 @@ class CreateItemView(APIView):
             attributes = serializer.data.get('attributes')
             charge = serializer.data.get('charge')
             durability = serializer.data.get('durability')
+            print("character id is:", serializer.data.get('belongsTo'))
+            print(serializer.data)
+            belongsTo = Character.objects.get(id=serializer.data.get('belongsTo'))
+            isEquipped = serializer.data.get('isEquipped')
+            inInventory = serializer.data.get('inInventory')
+            sellValue = serializer.data.get('sellValue')
             queryset = Item.objects.filter(Q(chapter = chapter) & Q(name = name) & Q(referenceParagraph = referenceParagraph))
             if queryset.exists():
                 item = queryset[0]
@@ -486,139 +492,139 @@ class CreateItemView(APIView):
                 return Response(ItemSerializer(item).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
-                    item = Item(name = name, chapter = chapter, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, typ = typ, slot = slot, quantity = quantity, creator = creator, rarity = rarity, appearance = appearance, details = details, attributes = attributes, charge = charge, durability = durability)
+                    item = Item(name = name, chapter = chapter, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, typ = typ, slot = slot, quantity = quantity, creator = creator, rarity = rarity, appearance = appearance, details = details, attributes = attributes, charge = charge, durability = durability, belongsTo = belongsTo, isEquipped = isEquipped, inInventory = inInventory, sellValue = sellValue)
                     item.save()
                     return Response(ItemSerializer(item).data, status = status.HTTP_201_CREATED)
                 else:
-                    item = Item(name = name, chapter = chapter, referenceParagraph = referenceParagraph, typ = typ, slot = slot, quantity = quantity, creator = creator, rarity = rarity, appearance = appearance, details = details, attributes = attributes, charge = charge, durability = durability)
+                    item = Item(name = name, chapter = chapter, referenceParagraph = referenceParagraph, typ = typ, slot = slot, quantity = quantity, creator = creator, rarity = rarity, appearance = appearance, details = details, attributes = attributes, charge = charge, durability = durability, belongsTo = belongsTo, isEquipped = isEquipped, inInventory = inInventory, sellValue = sellValue)
                     item.save()
                     return Response(ItemSerializer(item).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
 
-class CreateEquipmentView(APIView):
-    serializer_class = CreateEquipmentSerializer
+# class CreateEquipmentView(APIView):
+#     serializer_class = CreateEquipmentSerializer
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            player = Player.objects.get(id=serializer.data.get('player'))
-            referenceParagraph = serializer.data.get('referenceParagraph')
-            referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
-            head = serializer.data.get('head')
-            neck = serializer.data.get('neck')
-            shoulders = serializer.data.get('shoulders')
-            back = serializer.data.get('back')
-            chest = serializer.data.get('chest')
-            wrist = serializer.data.get('wrist')
-            waist = serializer.data.get('waist')
-            underpants = serializer.data.get('underpants')
-            legs = serializer.data.get('legs')
-            feet = serializer.data.get('feet')
-            main_hand = serializer.data.get('main_hand')
-            off_hand = serializer.data.get('off_hand')
-            ranged = serializer.data.get('ranged')
-            trinket = serializer.data.get('trinket')
-            ring1 = serializer.data.get('ring1')
-            ring2 = serializer.data.get('ring2')
-            ring3 = serializer.data.get('ring3')
-            ring4 = serializer.data.get('ring4')
-            ring5 = serializer.data.get('ring5')
-            ring6 = serializer.data.get('ring6')
-            ring7 = serializer.data.get('ring7')
-            ring8 = serializer.data.get('ring8')
-            ring9 = serializer.data.get('ring9')
-            ring10 = serializer.data.get('ring10')
-            earring1 = serializer.data.get('earring1')
-            earring2 = serializer.data.get('earring2')
-            queryset = Equipment.objects.filter(Q(player = player) & Q(referenceParagraph = referenceParagraph))
-            if queryset.exists():
-                equipment = queryset[0]
-                equipment.head = head
-                equipment.neck = neck
-                equipment.shoulders = shoulders
-                equipment.back = back
-                equipment.chest = chest
-                equipment.wrist = wrist
-                equipment.waist = waist
-                equipment.underpants = underpants
-                equipment.legs = legs
-                equipment.feet = feet
-                equipment.main_hand = main_hand
-                equipment.off_hand = off_hand
-                equipment.ranged = ranged
-                equipment.trinket = trinket
-                equipment.ring1 = ring1
-                equipment.ring2 = ring2
-                equipment.ring3 = ring3
-                equipment.ring4 = ring4
-                equipment.ring5 = ring5
-                equipment.ring6 = ring6
-                equipment.ring7 = ring7
-                equipment.ring8 = ring8
-                equipment.ring9 = ring9
-                equipment.ring10 = ring10
-                equipment.earring1 = earring1
-                equipment.earring2 = earring2
-                equipment.save(update_fields=['head', 'neck', 'shoulders', 'back', 'chest', 'wrist', 'waist', 'underpants', 'legs', 'feet', 'main_hand', 'off_hand', 'ranged', 'trinket', 'ring1', 'ring2', 'ring3', 'ring4', 'ring5', 'ring6', 'ring7', 'ring8', 'ring9', 'ring10', 'earring1', 'earring2'])
-                return Response(EquipmentSerializer(equipment).data, status = status.HTTP_200_OK)
-            else:
-                equipment = Item(player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, head = head, neck = neck, shoulders = shoulders, back = back, chest = chest, wrist = wrist, waist = waist, underpants = underpants, legs = legs, feet = feet, main_hand = main_hand, off_hand = off_hand, ranged = ranged, trinket = trinket, ring1 = ring1, ring2 = ring2, ring3 = ring3, ring4 = ring4, ring5 = ring5, ring6 = ring6, ring7 = ring7, ring8 = ring8, ring9 = ring9, ring10 = ring10, earring1 = earring1, earring2 = earring2)
-                equipment.save()
-                return Response(EquipmentSerializer(equipment).data, status = status.HTTP_201_CREATED)
-        return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
+#     def post(self, request, format=None):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             player = Player.objects.get(id=serializer.data.get('player'))
+#             referenceParagraph = serializer.data.get('referenceParagraph')
+#             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
+#             head = serializer.data.get('head')
+#             neck = serializer.data.get('neck')
+#             shoulders = serializer.data.get('shoulders')
+#             back = serializer.data.get('back')
+#             chest = serializer.data.get('chest')
+#             wrist = serializer.data.get('wrist')
+#             waist = serializer.data.get('waist')
+#             underpants = serializer.data.get('underpants')
+#             legs = serializer.data.get('legs')
+#             feet = serializer.data.get('feet')
+#             main_hand = serializer.data.get('main_hand')
+#             off_hand = serializer.data.get('off_hand')
+#             ranged = serializer.data.get('ranged')
+#             trinket = serializer.data.get('trinket')
+#             ring1 = serializer.data.get('ring1')
+#             ring2 = serializer.data.get('ring2')
+#             ring3 = serializer.data.get('ring3')
+#             ring4 = serializer.data.get('ring4')
+#             ring5 = serializer.data.get('ring5')
+#             ring6 = serializer.data.get('ring6')
+#             ring7 = serializer.data.get('ring7')
+#             ring8 = serializer.data.get('ring8')
+#             ring9 = serializer.data.get('ring9')
+#             ring10 = serializer.data.get('ring10')
+#             earring1 = serializer.data.get('earring1')
+#             earring2 = serializer.data.get('earring2')
+#             queryset = Equipment.objects.filter(Q(player = player) & Q(referenceParagraph = referenceParagraph))
+#             if queryset.exists():
+#                 equipment = queryset[0]
+#                 equipment.head = head
+#                 equipment.neck = neck
+#                 equipment.shoulders = shoulders
+#                 equipment.back = back
+#                 equipment.chest = chest
+#                 equipment.wrist = wrist
+#                 equipment.waist = waist
+#                 equipment.underpants = underpants
+#                 equipment.legs = legs
+#                 equipment.feet = feet
+#                 equipment.main_hand = main_hand
+#                 equipment.off_hand = off_hand
+#                 equipment.ranged = ranged
+#                 equipment.trinket = trinket
+#                 equipment.ring1 = ring1
+#                 equipment.ring2 = ring2
+#                 equipment.ring3 = ring3
+#                 equipment.ring4 = ring4
+#                 equipment.ring5 = ring5
+#                 equipment.ring6 = ring6
+#                 equipment.ring7 = ring7
+#                 equipment.ring8 = ring8
+#                 equipment.ring9 = ring9
+#                 equipment.ring10 = ring10
+#                 equipment.earring1 = earring1
+#                 equipment.earring2 = earring2
+#                 equipment.save(update_fields=['head', 'neck', 'shoulders', 'back', 'chest', 'wrist', 'waist', 'underpants', 'legs', 'feet', 'main_hand', 'off_hand', 'ranged', 'trinket', 'ring1', 'ring2', 'ring3', 'ring4', 'ring5', 'ring6', 'ring7', 'ring8', 'ring9', 'ring10', 'earring1', 'earring2'])
+#                 return Response(EquipmentSerializer(equipment).data, status = status.HTTP_200_OK)
+#             else:
+#                 equipment = Item(player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, head = head, neck = neck, shoulders = shoulders, back = back, chest = chest, wrist = wrist, waist = waist, underpants = underpants, legs = legs, feet = feet, main_hand = main_hand, off_hand = off_hand, ranged = ranged, trinket = trinket, ring1 = ring1, ring2 = ring2, ring3 = ring3, ring4 = ring4, ring5 = ring5, ring6 = ring6, ring7 = ring7, ring8 = ring8, ring9 = ring9, ring10 = ring10, earring1 = earring1, earring2 = earring2)
+#                 equipment.save()
+#                 return Response(EquipmentSerializer(equipment).data, status = status.HTTP_201_CREATED)
+#         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
 
-class CreateInventoryView(APIView):
-    serializer_class = CreateInventorySerializer
+# class CreateInventoryView(APIView):
+#     serializer_class = CreateInventorySerializer
 
-    def get(self, request, format=None):
-        player = request.query_params.get('player')
-        chapterid = request.query_params.get('chapter')
-        paragraph = request.query_params.get('paragraph')
-        if player and chapterid and paragraph:
-            inventory = Inventory.objects.filter(player__name=player, player__character__chapter=chapterid, referenceParagraph__lt=paragraph).order_by('-id').first()
-            return Response(InventorySerializer(inventory).data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+#     def get(self, request, format=None):
+#         player = request.query_params.get('player')
+#         chapterid = request.query_params.get('chapter')
+#         paragraph = request.query_params.get('paragraph')
+#         if player and chapterid and paragraph:
+#             inventory = Inventory.objects.filter(player__name=player, player__character__chapter=chapterid, referenceParagraph__lt=paragraph).order_by('-id').first()
+#             return Response(InventorySerializer(inventory).data, status=status.HTTP_200_OK)
+#         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            player = Player.objects.get(id=serializer.data.get('player'))
-            referenceParagraph = serializer.data.get('referenceParagraph')
-            referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
-            slots = serializer.data.get('slots')
-            queryset = Inventory.objects.filter(Q(player = player) & Q(referenceParagraph = referenceParagraph))
-            if queryset.exists():
-                inventory = queryset[0]
-                inventory.slots = slots
-                inventory.save(update_fields=['slots'])
-                return Response(InventorySerializer(inventory).data, status = status.HTTP_200_OK)
-            else:
-                inventory = Inventory(player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, slots = slots)
-                inventory.save()
-                return Response(InventorySerializer(inventory).data, status = status.HTTP_201_CREATED)
-        return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
+#     def post(self, request, format=None):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             player = Player.objects.get(id=serializer.data.get('player'))
+#             referenceParagraph = serializer.data.get('referenceParagraph')
+#             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
+#             slots = serializer.data.get('slots')
+#             queryset = Inventory.objects.filter(Q(player = player) & Q(referenceParagraph = referenceParagraph))
+#             if queryset.exists():
+#                 inventory = queryset[0]
+#                 inventory.slots = slots
+#                 inventory.save(update_fields=['slots'])
+#                 return Response(InventorySerializer(inventory).data, status = status.HTTP_200_OK)
+#             else:
+#                 inventory = Inventory(player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, slots = slots)
+#                 inventory.save()
+#                 return Response(InventorySerializer(inventory).data, status = status.HTTP_201_CREATED)
+#         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
 
-class CreateSlotView(APIView):
-    serializer_class = CreateSlotSerializer
+# class CreateSlotView(APIView):
+#     serializer_class = CreateSlotSerializer
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            inventory = Inventory.objects.get(id=serializer.data.get('inventory'))
-            item = Item.objects.get(id=serializer.data.get('item'))
-            referenceParagraph = serializer.data.get('referenceParagraph')
-            referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
-            queryset = Slot.objects.filter(Q(inventory = inventory) & Q(referenceParagraph = referenceParagraph))
-            if queryset.exists():
-                slot = queryset[0]
-                slot.item = item
-                slot.save(update_fields=['item'])
-                return Response(SlotSerializer(slot).data, status = status.HTTP_200_OK)
-            else:
-                slot = Slot(inventory = inventory, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, item = item)
-                slot.save()
-                return Response(SlotSerializer(slot).data, status = status.HTTP_201_CREATED)
-        return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
+#     def post(self, request, format=None):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             inventory = Inventory.objects.get(id=serializer.data.get('inventory'))
+#             item = Item.objects.get(id=serializer.data.get('item'))
+#             referenceParagraph = serializer.data.get('referenceParagraph')
+#             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
+#             queryset = Slot.objects.filter(Q(inventory = inventory) & Q(referenceParagraph = referenceParagraph))
+#             if queryset.exists():
+#                 slot = queryset[0]
+#                 slot.item = item
+#                 slot.save(update_fields=['item'])
+#                 return Response(SlotSerializer(slot).data, status = status.HTTP_200_OK)
+#             else:
+#                 slot = Slot(inventory = inventory, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, item = item)
+#                 slot.save()
+#                 return Response(SlotSerializer(slot).data, status = status.HTTP_201_CREATED)
+#         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateCurrencyView(APIView):
     serializer_class = CreateCurrencySerializer
@@ -627,7 +633,7 @@ class CreateCurrencyView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             name = serializer.data.get('name')
-            player = Inventory.objects.get(id=serializer.data.get('player'))
+            player = Player.objects.get(id=serializer.data.get('player'))
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
             amount = serializer.data.get('amount')

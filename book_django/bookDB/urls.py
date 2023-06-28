@@ -23,8 +23,8 @@ urlpatterns = [
     path('create-quest/', views.CreateQuestView.as_view()),
     path('create-achievement/', views.CreateAchievementView.as_view()),
     path('create-item/', views.CreateItemView.as_view()),
-    path('create-equipment/', views.CreateEquipmentView.as_view()),
-    path('create-inventory/', views.CreateInventoryView.as_view()),
-    path('create-slot/', views.CreateSlotView.as_view()),
+    # path('create-equipment/', views.CreateEquipmentView.as_view()),
+    # path('create-inventory/', views.CreateInventoryView.as_view()),
+    # path('create-slot/', views.CreateSlotView.as_view()),
     path('create-currency/', views.CreateCurrencyView.as_view()),
 ]

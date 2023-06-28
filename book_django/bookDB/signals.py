@@ -11,9 +11,9 @@ from .serializers import *
 @receiver(post_save, sender=Quest)
 @receiver(post_save, sender=Achievement)
 @receiver(post_save, sender=Item)
-@receiver(post_save, sender=Equipment)
-@receiver(post_save, sender=Inventory)
-@receiver(post_save, sender=Slot)
+# @receiver(post_save, sender=Equipment)
+# @receiver(post_save, sender=Inventory)
+# @receiver(post_save, sender=Slot)
 @receiver(post_save, sender=Currency)
 def set_my_field(sender, instance, **kwargs):
     if instance.referenceToLastRelevantEvent == 0:
@@ -55,26 +55,6 @@ def create_related_characters(sender, instance, created, **kwargs):
                     thumbnail=referenceCharacter.thumbnail
                 )
                 copyOfCharacter.save()
-            # Creating copies of all the latest ITEM instances
-            querysetItem = Item.objects.filter(chapter=prev_chapter).values('name').annotate(highest_id=Max('id'))
-            for group in querysetItem:
-                referenceItem = Item.objects.get(id=group['highest_id'])
-                copyOfItem = Item(
-                    name=referenceItem.name,
-                    chapter=instance,
-                    referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
-                    typ=referenceItem.typ,
-                    slot=referenceItem.slot,
-                    quantity=referenceItem.quantity,
-                    creator=referenceItem.creator,
-                    rarity=referenceItem.rarity,
-                    appearance=referenceItem.appearance,
-                    details=referenceItem.details,
-                    attributes=referenceItem.attributes,
-                    charge=referenceItem.charge,
-                    durability=referenceItem.durability
-                )
-                copyOfItem.save()
 
 @receiver(post_save, sender=Character)
 def create_related_players(sender, instance, created, **kwargs):
@@ -108,8 +88,30 @@ def create_related_players(sender, instance, created, **kwargs):
                     thumbnail=referencePlayer.thumbnail
                 )
                 copyOfPlayer.save()
-
-
+            # Creating copies of all the latest ITEM instances
+            querysetItem = Item.objects.filter(belongsTo__chapter=prev_chapter).values('name').annotate(highest_id=Max('id'))
+            for group in querysetItem:
+                referenceItem = Item.objects.get(id=group['highest_id'])
+                copyOfItem = Item(
+                    name=referenceItem.name,
+                    chapter=instance,
+                    referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
+                    typ=referenceItem.typ,
+                    slot=referenceItem.slot,
+                    quantity=referenceItem.quantity,
+                    creator=referenceItem.creator,
+                    rarity=referenceItem.rarity,
+                    appearance=referenceItem.appearance,
+                    details=referenceItem.details,
+                    attributes=referenceItem.attributes,
+                    charge=referenceItem.charge,
+                    durability=referenceItem.durability,
+                    belongsTo=instance,
+                    isEquipped=referenceItem.isEquipped,
+                    inInventory=referenceItem.inInventory,
+                    sellValue=referenceItem.sellValue
+                )
+                copyOfItem.save()
 
 
 @receiver(post_save, sender=Player)
@@ -195,52 +197,79 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
                 except Exception as e:
                     print(e)
                     continue
-            # Creating copies of all the latest INVENTORY instances
-            querysetInventories = Inventory.objects.filter(player__character__chapter=prev_chapter).values('player').annotate(highest_id=Max('id'))
-            print(querysetInventories)
-            for group in querysetInventories:
-                referenceInventory = Inventory.objects.get(id=group['highest_id'])
-                copyOfInventory = Inventory(
-                    player=instance,
-                    referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
-                    slots=referenceInventory.slots
-                )
-                copyOfInventory.save()
-            # Creating copies of all the latest EQUIPMENT instances
-            querysetEquipment = Equipment.objects.filter(player__character__chapter=prev_chapter).values('player').annotate(highest_id=Max('id'))
-            for group in querysetEquipment:
-                referenceEquipment = Equipment.objects.get(id=group['highest_id'])
-                copyOfEquipment = Equipment(
-                    player=instance,
-                    referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
-                    head=referenceEquipment.head,
-                    neck=referenceEquipment.neck,
-                    shoulders=referenceEquipment.shoulders,
-                    back=referenceEquipment.back,
-                    chest=referenceEquipment.chest,
-                    wrist=referenceEquipment.wrist,
-                    waist=referenceEquipment.waist,
-                    underpants=referenceEquipment.underpants,
-                    legs=referenceEquipment.legs,
-                    feet=referenceEquipment.feet,
-                    main_hand=referenceEquipment.main_hand,
-                    off_hand=referenceEquipment.off_hand,
-                    ranged=referenceEquipment.ranged,
-                    trinket=referenceEquipment.trinket,
-                    ring1=referenceEquipment.ring1,
-                    ring2=referenceEquipment.ring2,
-                    ring3=referenceEquipment.ring3,
-                    ring4=referenceEquipment.ring4,
-                    ring5=referenceEquipment.ring5,
-                    ring6=referenceEquipment.ring6,
-                    ring7=referenceEquipment.ring7,
-                    ring8=referenceEquipment.ring8,
-                    ring9=referenceEquipment.ring9,
-                    ring10=referenceEquipment.ring10,
-                    earring1=referenceEquipment.earring1,
-                    earring2=referenceEquipment.earring2
-                )
-                copyOfEquipment.save()
+            # # Creating copies of all the latest INVENTORY instances
+            # querysetInventories = Inventory.objects.filter(player__character__chapter=prev_chapter).values('player').annotate(highest_id=Max('id'))
+            # for group in querysetInventories:
+            #     referenceInventory = Inventory.objects.get(id=group['highest_id'])
+            #     copyOfInventory = Inventory(
+            #         player=instance,
+            #         referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
+            #         slots=referenceInventory.slots
+            #     )
+            #     copyOfInventory.save()
+            # # Creating copies of all the latest EQUIPMENT instances
+            # querysetItems = Item.objects.filter(chapter=current_chapter).values('name').annotate(highest_id=Max('id'))
+            # # This doesn't work because I need to also loop by group and then filter by highest ID. 
+            # querysetEquipment = Equipment.objects.filter(player__character__chapter=prev_chapter).values('player').annotate(highest_id=Max('id'))
+            # for group in querysetEquipment:
+            #     # referenceEquipment = Equipment.objects.get(id=group['highest_id'])
+            #     copyOfEquipment = Equipment(
+            #         player=instance,
+            #         referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1
+            #     )
+            #     result, querysetItems = itemAllocation(querysetItems, 'Head')
+            #     copyOfEquipment.head = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Neck')
+            #     copyOfEquipment.neck = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Shoulders')
+            #     copyOfEquipment.shoulders = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Back')
+            #     copyOfEquipment.back = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Chest')
+            #     copyOfEquipment.chest = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Wrist')
+            #     copyOfEquipment.wrist = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Waist')
+            #     copyOfEquipment.waist = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Underpants')
+            #     copyOfEquipment.underpants = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Legs')
+            #     copyOfEquipment.legs = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Feet')
+            #     copyOfEquipment.feet = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Hand')
+            #     copyOfEquipment.main_hand = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Hand')
+            #     copyOfEquipment.off_hand = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ranged')
+            #     copyOfEquipment.ranged = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Trinket')
+            #     copyOfEquipment.trinket = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring1 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring2 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring3 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring4 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring5 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring6 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring7 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring8 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring9 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Ring')
+            #     copyOfEquipment.ring10 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Earring')
+            #     copyOfEquipment.earring1 = result
+            #     result, querysetItems = itemAllocation(querysetItems, 'Earring')
+            #     copyOfEquipment.earring1 = result
+            #     copyOfEquipment.save()
             # Creating copies of all the latest CURRENCY instances
             querysetCurrencies = Currency.objects.filter(player__character__chapter=prev_chapter).values('player').annotate(highest_id=Max('id'))
             for group in querysetCurrencies:
@@ -299,36 +328,39 @@ def create_related_Skills(sender, instance, created, **kwargs):
                     print(e)
                     continue
 
-@receiver(post_save, sender=Inventory)
-def create_related_Slots(sender, instance, created, **kwargs):
-    current_inventory = InventorySerializer(instance).data
-    current_player_model = Player.objects.get(id=current_inventory['player'])
-    current_player = PlayerSerializer(current_player_model).data
-    current_character = CharacterSerializer(Character.objects.get(id=current_player['character'])).data
-    # current_paragraph = ParagraphSerializer(Paragraph.objects.get(id=current_character['paragraph'])).data
-    current_chapter_model = Chapter.objects.get(id=current_character['chapter'])
-    current_chapter = ChapterSerializer(current_chapter_model).data
-    if created and len(Paragraph.objects.filter(chapter = current_chapter['id'])) == 0:
-        prev_chapter_name = "Chapter " + str(int(current_chapter['name'].split(' ')[1]) - 1)
-        prev_chapter = None
-        try: 
-            prev_chapter = Chapter.objects.get(name = prev_chapter_name)
-        except:
-            prev_chapter = None
-            print("Chapter does not exist!")
-        if prev_chapter:
-            # Creating copies of all the latest SLOT instances
-            querysetSlots = Slot.objects.filter(inventory__player__character__chapter=prev_chapter).values('inventory').annotate(highest_id=Max('id'))
-            for group in querysetSlots:
-                referenceSlot = Slot.objects.get(id=group['highest_id'])
-                current_item_name = ItemSerializer(Item.objects.get(id=referenceSlot['item'])).data
-                current_item = Item.objects.get(name=current_item_name['name'], chapter=current_chapter['id'])
-                copyOfSlot = Slot(
-                    inventory=instance,
-                    player=current_player_model,
-                    referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
-                    item=current_item
-                )
-                copyOfSlot.save()
+# @receiver(post_save, sender=Inventory)
+# def create_related_Slots(sender, instance, created, **kwargs):
+#     current_inventory = InventorySerializer(instance).data
+#     current_player_model = Player.objects.get(id=current_inventory['player'])
+#     current_player = PlayerSerializer(current_player_model).data
+#     current_character = CharacterSerializer(Character.objects.get(id=current_player['character'])).data
+#     # current_paragraph = ParagraphSerializer(Paragraph.objects.get(id=current_character['paragraph'])).data
+#     current_chapter_model = Chapter.objects.get(id=current_character['chapter'])
+#     current_chapter = ChapterSerializer(current_chapter_model).data
+#     if created and len(Paragraph.objects.filter(chapter = current_chapter['id'])) == 0:
+#         prev_chapter_name = "Chapter " + str(int(current_chapter['name'].split(' ')[1]) - 1)
+#         prev_chapter = None
+#         try: 
+#             prev_chapter = Chapter.objects.get(name = prev_chapter_name)
+#         except:
+#             prev_chapter = None
+#             print("Chapter does not exist!")
+#         if prev_chapter:
+#             # Creating copies of all the latest SLOT instances
+#             querysetItems = Item.objects.filter(chapter=current_chapter, inInventory=True)
+#             # Gotta put the right items into new slots. Per player. 
+#             # Question: how do I know which Item belongED to which player?
+#             querysetSlots = Slot.objects.filter(inventory__player__character__chapter=prev_chapter).values('inventory').annotate(highest_id=Max('id'))
+#             for group in querysetSlots:
+#                 referenceSlot = Slot.objects.get(id=group['highest_id'])
+#                 # current_item_name = ItemSerializer(Item.objects.get(id=referenceSlot['item'])).data
+#                 # current_item = Item.objects.get(name=current_item_name['name'], chapter=current_chapter['id'])
+#                 copyOfSlot = Slot(
+#                     inventory=instance,
+#                     player=current_player_model,
+#                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
+#                     item=current_item
+#                 )
+#                 copyOfSlot.save()
 
 # I should not look for the highest ID value, but the highest referenceParagraph value, since new instances might be added later

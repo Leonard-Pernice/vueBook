@@ -313,6 +313,11 @@ class Item(models.Model):
     charge = models.IntegerField(default=0, blank=True, null=True)
     durability = models.IntegerField(default=100, blank=True, null=True)
 
+    belongsTo = models.ForeignKey(Character, on_delete=models.CASCADE, related_name='items')
+    isEquipped = models.BooleanField(default=False)
+    inInventory = models.BooleanField(default=True)
+    sellValue = models.IntegerField(default=0)
+
     @property
     def typeReference(self):
         return 'item'
@@ -320,75 +325,75 @@ class Item(models.Model):
     def __str__(self):
         return ''.join([str(self.id), ': ', self.name])
 
-class Equipment(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='players_equipment')
-    referenceParagraph = models.IntegerField(default=1)
-    referenceToLastRelevantEvent = models.IntegerField(default=0)
+# class Equipment(models.Model):
+#     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='players_equipment')
+#     referenceParagraph = models.IntegerField(default=1)
+#     referenceToLastRelevantEvent = models.IntegerField(default=0)
 
-    head = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_head', blank=True, null=True)
-    neck = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_neck', blank=True, null=True)
-    shoulders = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_shoulders', blank=True, null=True)
-    back = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_back', blank=True, null=True)
-    chest = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_chest', blank=True, null=True)
-    wrist = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_wrist', blank=True, null=True)
-    waist = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_waist', blank=True, null=True)
-    underpants = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_underpants', blank=True, null=True)
-    legs = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_legs', blank=True, null=True)
-    feet = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_feet', blank=True, null=True)
-    main_hand = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_main_hand', blank=True, null=True)
-    off_hand = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_off_hand', blank=True, null=True)
-    ranged = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ranged', blank=True, null=True)
-    trinket = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_trinket', blank=True, null=True)
-    ring1 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring1', blank=True, null=True)
-    ring2 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring2', blank=True, null=True)
-    ring3 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring3', blank=True, null=True)
-    ring4 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring4', blank=True, null=True)
-    ring5 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring5', blank=True, null=True)
-    ring6 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring6', blank=True, null=True)
-    ring7 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring7', blank=True, null=True)
-    ring8 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring8', blank=True, null=True)
-    ring9 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring9', blank=True, null=True)
-    ring10 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring10', blank=True, null=True)
-    earring1 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_earring1', blank=True, null=True)
-    earring2 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_earring2', blank=True, null=True)
+#     head = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_head', blank=True, null=True)
+#     neck = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_neck', blank=True, null=True)
+#     shoulders = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_shoulders', blank=True, null=True)
+#     back = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_back', blank=True, null=True)
+#     chest = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_chest', blank=True, null=True)
+#     wrist = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_wrist', blank=True, null=True)
+#     waist = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_waist', blank=True, null=True)
+#     underpants = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_underpants', blank=True, null=True)
+#     legs = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_legs', blank=True, null=True)
+#     feet = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_feet', blank=True, null=True)
+#     main_hand = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_main_hand', blank=True, null=True)
+#     off_hand = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_off_hand', blank=True, null=True)
+#     ranged = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ranged', blank=True, null=True)
+#     trinket = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_trinket', blank=True, null=True)
+#     ring1 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring1', blank=True, null=True)
+#     ring2 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring2', blank=True, null=True)
+#     ring3 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring3', blank=True, null=True)
+#     ring4 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring4', blank=True, null=True)
+#     ring5 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring5', blank=True, null=True)
+#     ring6 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring6', blank=True, null=True)
+#     ring7 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring7', blank=True, null=True)
+#     ring8 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring8', blank=True, null=True)
+#     ring9 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring9', blank=True, null=True)
+#     ring10 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_ring10', blank=True, null=True)
+#     earring1 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_earring1', blank=True, null=True)
+#     earring2 = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_earring2', blank=True, null=True)
 
-    @property
-    def typeReference(self):
-        return 'equipment'
+#     @property
+#     def typeReference(self):
+#         return 'equipment'
 
-    def __str__(self):
-        return ''.join([str(self.id), ' - inventory of: ', str(self.player)])
+#     def __str__(self):
+#         return ''.join([str(self.id), ' - inventory of: ', str(self.player)])
 
-class Inventory(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='players_inventory')
-    referenceParagraph = models.IntegerField(default=1)
-    referenceToLastRelevantEvent = models.IntegerField(default=0)
+# class Inventory(models.Model):
+#     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='players_inventory')
+#     referenceParagraph = models.IntegerField(default=1)
+#     referenceToLastRelevantEvent = models.IntegerField(default=0)
 
-    slots = models.IntegerField(default=16)
+#     slots = models.IntegerField(default=16)
 
-    @property
-    def typeReference(self):
-        return 'inventory'
+#     @property
+#     def typeReference(self):
+#         return 'inventory'
 
-    def __str__(self):
-        return ''.join([str(self.id), ': ', str(self.player)])
+#     def __str__(self):
+#         return ''.join([str(self.id), ': ', str(self.player)])
 
-class Slot(models.Model):
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='inventories')
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_inventory', blank=True, null=True)
-    referenceParagraph = models.IntegerField(default=1)
-    referenceToLastRelevantEvent = models.IntegerField(default=0)
+# class Slot(models.Model):
+#     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='inventories')
+#     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='items_inventory', blank=True, null=True)
+#     referenceParagraph = models.IntegerField(default=1)
+#     referenceToLastRelevantEvent = models.IntegerField(default=0)
 
-    @property
-    def typeReference(self):
-        return 'slot'
+#     @property
+#     def typeReference(self):
+#         return 'slot'
 
-    @property
-    def name(self):
-        return self.item.name
+#     @property
+#     def name(self):
+#         return self.item.name
 
-    def __str__(self):
-        return ''.join([str(self.id), ': ', str(self.item)])
+#     def __str__(self):
+#         return ''.join([str(self.id), ': ', str(self.item)])
 
 class Currency(models.Model):
     name = models.CharField(default="Coin", max_length=100)

@@ -103,8 +103,10 @@ useEventListener(document, 'scroll', () => {
     //   x should only be created once, but inside this function
     // x iterate backwards (high- to low key) and update data
     // o create functions for each type of event / update
-    //   o first event is "item" --> need to create inventory / slot / equipment events for this to ensure coherence & integrity
-    //   o currently my get methods don't return the @property attributes. change to fields???
+    //   o first event is "item", which is being equipped by Kale 
+    //   --> o create component for showing equipment
+    //       o connect the item to the appropriate slot
+    //   o currently my get methods don't return the @property attributes. change to fields??? not sure this is necessary
     //   o simplify the process by adapting everything to the same structure as the database
     //     -> then I only have to change the pointer, not all the values inside
     // x ensure the initialState is updated before each time an event is called to ensure the right eventStates are assumed
@@ -248,9 +250,6 @@ function insertDeepData (obj, key) {
 
 function segregateStores (obj) {
 
-  // Items
-  chapterStore.items = {}
-  chapterStore.items = insertSurfaceData(obj, 'items')
   // Characters
   chapterStore.characters = {}
   chapterStore.characters = insertSurfaceData(obj, 'characters')
@@ -263,6 +262,9 @@ function segregateStores (obj) {
   // Skills
   chapterStore.skills = {}
   chapterStore.skills = insertDeepData(chapterStore.players, 'skills')
+  // Items
+  chapterStore.items = {}
+  chapterStore.items = insertDeepData(obj['characters'], 'items')
   // Relationships
   chapterStore.relationships = {}
   chapterStore.relationships = insertDeepData(chapterStore.players, 'relationships')
@@ -272,15 +274,15 @@ function segregateStores (obj) {
   // Quests
   chapterStore.quests = {}
   chapterStore.quests = insertDeepData(chapterStore.players, 'quests')
-  // Inventories
-  chapterStore.inventories = {}
-  chapterStore.inventories = insertDeepData(chapterStore.players, 'inventories')
-  // Slots
-  chapterStore.slots = {}
-  chapterStore.slots = insertDeepData(chapterStore.inventories, 'slots')
-  // Equipments
-  chapterStore.equipments = {}
-  chapterStore.equipments = insertDeepData(chapterStore.players, 'equipments')
+  // // Inventories
+  // chapterStore.inventories = {}
+  // chapterStore.inventories = insertDeepData(chapterStore.players, 'inventories')
+  // // Slots
+  // chapterStore.slots = {}
+  // chapterStore.slots = insertDeepData(chapterStore.inventories, 'slots')
+  // // Equipments
+  // chapterStore.equipments = {}
+  // chapterStore.equipments = insertDeepData(chapterStore.players, 'equipments')
   // Currencies
   chapterStore.currencies = {}
   chapterStore.currencies = insertDeepData(chapterStore.players, 'currencies')

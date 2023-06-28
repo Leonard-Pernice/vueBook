@@ -76,67 +76,67 @@ class PlayerSerializer(serializers.ModelSerializer):
     #         ret[related_name] = {obj['name']: obj for obj in related_objs}
     #     return ret
 
-class InventorySerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
-    players_inventory = PlayerSerializer(many=True, read_only=True)
-    class Meta:
-        model = Inventory
-        fields = '__all__'
+# class InventorySerializer(serializers.ModelSerializer):
+#     typeReference = serializers.SerializerMethodField()
+#     players_inventory = PlayerSerializer(many=True, read_only=True)
+#     class Meta:
+#         model = Inventory
+#         fields = '__all__'
     
-    def get_typeReference(self, obj):
-        return obj.typeReference
+#     def get_typeReference(self, obj):
+#         return obj.typeReference
 
-class SlotSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
-    inventories = InventorySerializer(many=True, read_only=True)
-    items_inventory = ItemSerializer(many=True, read_only=True)
-    class Meta:
-        model = Slot
-        fields = '__all__'
+# class SlotSerializer(serializers.ModelSerializer):
+#     typeReference = serializers.SerializerMethodField()
+#     name = serializers.SerializerMethodField()
+#     inventories = InventorySerializer(many=True, read_only=True)
+#     items_inventory = ItemSerializer(many=True, read_only=True)
+#     class Meta:
+#         model = Slot
+#         fields = '__all__'
     
-    def get_typeReference(self, obj):
-        return obj.typeReference
+#     def get_typeReference(self, obj):
+#         return obj.typeReference
     
-    def get_name(self, obj):
-        return obj.name
+#     def get_name(self, obj):
+#         return obj.name
 
-class EquipmentSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
-    players_equipment = PlayerSerializer(many=True, read_only=True)
-    items_head = ItemSerializer(many=True, read_only=True)
-    items_neck = ItemSerializer(many=True, read_only=True)
-    items_neck = ItemSerializer(many=True, read_only=True)
-    items_shoulders = ItemSerializer(many=True, read_only=True)
-    items_back = ItemSerializer(many=True, read_only=True)
-    items_chest = ItemSerializer(many=True, read_only=True)
-    items_wrist = ItemSerializer(many=True, read_only=True)
-    items_waist = ItemSerializer(many=True, read_only=True)
-    items_underpants = ItemSerializer(many=True, read_only=True)
-    items_legs = ItemSerializer(many=True, read_only=True)
-    items_feet = ItemSerializer(many=True, read_only=True)
-    items_main_hand = ItemSerializer(many=True, read_only=True)
-    items_off_hand = ItemSerializer(many=True, read_only=True)
-    items_ranged = ItemSerializer(many=True, read_only=True)
-    items_trinket = ItemSerializer(many=True, read_only=True)
-    items_ring1 = ItemSerializer(many=True, read_only=True)
-    items_ring2 = ItemSerializer(many=True, read_only=True)
-    items_ring3 = ItemSerializer(many=True, read_only=True)
-    items_ring4 = ItemSerializer(many=True, read_only=True)
-    items_ring5 = ItemSerializer(many=True, read_only=True)
-    items_ring6 = ItemSerializer(many=True, read_only=True)
-    items_ring7 = ItemSerializer(many=True, read_only=True)
-    items_ring8 = ItemSerializer(many=True, read_only=True)
-    items_ring9 = ItemSerializer(many=True, read_only=True)
-    items_ring10 = ItemSerializer(many=True, read_only=True)
-    items_earring1 = ItemSerializer(many=True, read_only=True)
-    items_earring2 = ItemSerializer(many=True, read_only=True)
-    class Meta:
-        model = Equipment
-        fields = '__all__'
+# class EquipmentSerializer(serializers.ModelSerializer):
+#     typeReference = serializers.SerializerMethodField()
+#     players_equipment = PlayerSerializer(many=True, read_only=True)
+#     items_head = ItemSerializer(many=True, read_only=True)
+#     items_neck = ItemSerializer(many=True, read_only=True)
+#     items_neck = ItemSerializer(many=True, read_only=True)
+#     items_shoulders = ItemSerializer(many=True, read_only=True)
+#     items_back = ItemSerializer(many=True, read_only=True)
+#     items_chest = ItemSerializer(many=True, read_only=True)
+#     items_wrist = ItemSerializer(many=True, read_only=True)
+#     items_waist = ItemSerializer(many=True, read_only=True)
+#     items_underpants = ItemSerializer(many=True, read_only=True)
+#     items_legs = ItemSerializer(many=True, read_only=True)
+#     items_feet = ItemSerializer(many=True, read_only=True)
+#     items_main_hand = ItemSerializer(many=True, read_only=True)
+#     items_off_hand = ItemSerializer(many=True, read_only=True)
+#     items_ranged = ItemSerializer(many=True, read_only=True)
+#     items_trinket = ItemSerializer(many=True, read_only=True)
+#     items_ring1 = ItemSerializer(many=True, read_only=True)
+#     items_ring2 = ItemSerializer(many=True, read_only=True)
+#     items_ring3 = ItemSerializer(many=True, read_only=True)
+#     items_ring4 = ItemSerializer(many=True, read_only=True)
+#     items_ring5 = ItemSerializer(many=True, read_only=True)
+#     items_ring6 = ItemSerializer(many=True, read_only=True)
+#     items_ring7 = ItemSerializer(many=True, read_only=True)
+#     items_ring8 = ItemSerializer(many=True, read_only=True)
+#     items_ring9 = ItemSerializer(many=True, read_only=True)
+#     items_ring10 = ItemSerializer(many=True, read_only=True)
+#     items_earring1 = ItemSerializer(many=True, read_only=True)
+#     items_earring2 = ItemSerializer(many=True, read_only=True)
+#     class Meta:
+#         model = Equipment
+#         fields = '__all__'
     
-    def get_typeReference(self, obj):
-        return obj.typeReference
+#     def get_typeReference(self, obj):
+#         return obj.typeReference
 
 class CurrencySerializer(serializers.ModelSerializer):
     typeReference = serializers.SerializerMethodField()
@@ -151,6 +151,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 class CharacterSerializer(serializers.ModelSerializer):
     typeReference = serializers.SerializerMethodField()
     players = PlayerSerializer(many=True, read_only=True)
+    items = ItemSerializer(many=True, read_only=True)
     class Meta:
         model = Character
         fields = '__all__'
@@ -176,7 +177,6 @@ class BookSerializer(serializers.ModelSerializer):
 class ChapterSerializer(serializers.ModelSerializer):
     paragraphs = ParagraphSerializer(many=True, read_only=True)
     characters = CharacterSerializer(many=True, read_only=True)
-    items = ItemSerializer(many=True, read_only=True)
     book = BookSerializer(read_only=True)
     class Meta:
         model = Chapter
@@ -249,22 +249,22 @@ class CreateRelationshipSerializer(serializers.ModelSerializer):
 class CreateItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ['name', 'chapter', 'referenceParagraph', 'referenceToLastRelevantEvent', 'typ', 'slot', 'quantity', 'creator', 'rarity', 'appearance', 'details', 'attributes', 'charge', 'durability']
+        fields = ['name', 'chapter', 'referenceParagraph', 'referenceToLastRelevantEvent', 'typ', 'slot', 'quantity', 'creator', 'rarity', 'appearance', 'details', 'attributes', 'charge', 'durability', 'belongsTo', 'isEquipped', 'inInventory', 'sellValue']
 
-class CreateEquipmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Equipment
-        fields = ['player', 'referenceParagraph', 'referenceToLastRelevantEvent', 'head', 'neck', 'shoulders', 'back', 'chest', 'wrist', 'waist', 'underpants', 'legs', 'feet', 'main_hand', 'off_hand', 'ranged', 'trinket', 'ring1', 'ring2', 'ring3', 'ring4', 'ring5', 'ring6', 'ring7', 'ring8', 'ring9', 'ring10', 'earring1', 'earring2']
+# class CreateEquipmentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Equipment
+#         fields = ['player', 'referenceParagraph', 'referenceToLastRelevantEvent', 'head', 'neck', 'shoulders', 'back', 'chest', 'wrist', 'waist', 'underpants', 'legs', 'feet', 'main_hand', 'off_hand', 'ranged', 'trinket', 'ring1', 'ring2', 'ring3', 'ring4', 'ring5', 'ring6', 'ring7', 'ring8', 'ring9', 'ring10', 'earring1', 'earring2']
 
-class CreateInventorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Inventory
-        fields = ['player', 'referenceParagraph', 'referenceToLastRelevantEvent', 'slots']
+# class CreateInventorySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Inventory
+#         fields = ['player', 'referenceParagraph', 'referenceToLastRelevantEvent', 'slots']
 
-class CreateSlotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Slot
-        fields = ['inventory', 'item', 'referenceParagraph', 'referenceToLastRelevantEvent']
+# class CreateSlotSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Slot
+#         fields = ['inventory', 'item', 'referenceParagraph', 'referenceToLastRelevantEvent']
 
 class CreateCurrencySerializer(serializers.ModelSerializer):
     class Meta:
