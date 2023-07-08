@@ -39,7 +39,8 @@ function calcExp () {
 
 const props = defineProps({
   a: {
-    type: Object
+    type: Object,
+    default: () => ({})
   }
 })
 

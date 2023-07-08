@@ -58,9 +58,10 @@
         </BaseTooltip>
         <div name="STAT BAR VALUE" class="flex justify-center p-0.5 w-full text-center h-6 col-span-2">
           <div name="STAT BAR" class="relative col-span-3 lg:col-span-7 w-full bg-gray-200 text-black">
-            <div class="absolute inline-block left-0 h-full text-xs text-center"
-                :style="{ width: (stat[1] === 0 ? ('-') : (stat[3]/(stat[1])*100).toFixed(0)+'%'),
-                'background-color': stat[1] === 0 ? ('black') : (stat[5]) }">
+            <div
+              class="absolute inline-block left-0 h-full text-xs text-center"
+              :style="{ width: (stat[1] === 0 ? ('-') : (stat[3]/(stat[1])*100).toFixed(0)+'%'),
+              'background-color': stat[1] === 0 ? ('black') : (stat[5]) }">
             </div>
             <div class="absolute inline-block top-[10%] left-2 text-xs text-white">{{ calcStatValue(stat) }}</div>
           </div>

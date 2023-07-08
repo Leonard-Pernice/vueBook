@@ -22,7 +22,8 @@ import GlowText from '@/components/GlowText.vue'
 
 const props = defineProps({
   p: {
-    type: Object
+    type: Object,
+    default: () => ({})
   }
 })
 

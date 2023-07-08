@@ -27,7 +27,25 @@ export const useChapterStore = defineStore('chapter', {
     currentQuests: Object,
     currentAchievements: Object,
     currentPact: Object,
-    currentParagon: Object
+    currentParagon: Object,
+    currentInventory: [],
+    currentEquipment: {
+      head: Object,
+      neck: Object,
+      shoulders: Object,
+      back: Object,
+      chest: Object,
+      wrist: Object,
+      waist: Object,
+      underpants: Object,
+      legs: Object,
+      feet: Object,
+      hands: [],
+      ranged: Object,
+      trinket: Object,
+      rings: [],
+      earrings: []
+    }
   }),
   actions: {
     changeChapter (number) {

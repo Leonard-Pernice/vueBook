@@ -9,6 +9,9 @@
 <script setup>
 
 const props = defineProps({
-  content: String
+  content: {
+    type: String,
+    default: ''
+  }
 })
 </script>

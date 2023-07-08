@@ -29,7 +29,8 @@ import ItemMsg from '@/components/ItemMsg.vue'
 
 const props = defineProps({
   p: {
-    type: Object
+    type: Object,
+    default: () => ({})
   }
 })
 

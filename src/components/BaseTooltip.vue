@@ -9,13 +9,14 @@
         class="">
         <slot/>
     </div>
-    <div ref="floatingRef"
-    :class="[
-      'absolute top-0 left-0 z-50 bg-gradient-radial from-gr-inner-blue to-gr-outer-blue text-sm text-white px-3 py-1.5 rounded-md cursor-default border-2 border-cyan-500',
-      isHidden && 'hidden'
-    ]">
-    {{ props.content }}
-    <div ref="arrowRef" class="absolute bg-gr-inner-blue h-2 w-2 rotate-45 border-2 border-cyan-500"></div>
+    <div 
+      ref="floatingRef"
+      :class="[
+        'absolute top-0 left-0 z-50 bg-gradient-radial from-gr-inner-blue to-gr-outer-blue text-sm text-white px-3 py-1.5 rounded-md cursor-default border-2 border-cyan-500',
+        isHidden && 'hidden'
+      ]">
+      {{ props.content }}
+      <div ref="arrowRef" class="absolute bg-gr-inner-blue h-2 w-2 rotate-45 border-2 border-cyan-500"></div>
     </div>
   </div>
   </template>
@@ -25,7 +26,10 @@ import { arrow, computePosition, flip, offset, shift } from '@floating-ui/dom'
 import { ref } from 'vue'
 
 const props = defineProps({
-  content: String,
+  content: {
+    type: String,
+    default: ''
+  },
   placement: {
     type: String,
     default: 'right'

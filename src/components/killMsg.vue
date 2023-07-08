@@ -9,7 +9,8 @@
 
 const props = defineProps({
   p: {
-    type: Object
+    type: Object,
+    default: () => ({})
   }
 })
 

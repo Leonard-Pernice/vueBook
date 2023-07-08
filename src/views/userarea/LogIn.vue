@@ -15,7 +15,7 @@
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" @click="toggleShowPassword"></button>
         </div>
         <div class="bg-red-500 text-white p-4 rounded-md" v-if="userdata.errors.length">
-          <p v-for="error in userdata.errors" v-bind:key="error">{{ error }}</p>
+          <p v-for="error in userdata.errors" :key="error">{{ error }}</p>
         </div>
         <div class="card-footer">
           <button class="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-md w-full">Log in</button>

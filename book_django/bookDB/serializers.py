@@ -2,62 +2,50 @@ from rest_framework import serializers
 from .models import *
 
 class ItemSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     class Meta:
         model = Item
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
 
 class StatSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     class Meta:
         model = Stat
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
         
 class SkillSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     stat = StatSerializer(many=True, read_only=True)
     class Meta:
         model = Skill
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
 
 class QuestSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     class Meta:
         model = Quest
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
 
 class AchievementSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     class Meta:
         model = Achievement
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
 
 class RelationshipSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     class Meta:
         model = Relationship
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
 
 class PlayerSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     stats = StatSerializer(many=True, read_only=True)
     skills = SkillSerializer(many=True, read_only=True)
     quests = QuestSerializer(many=True, read_only=True)
@@ -66,9 +54,7 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
     # def to_representation(self, instance):
     #     ret = super().to_representation(instance)
     #     for related_name in ['stats', 'skills', 'quests', 'achievements']:
@@ -77,7 +63,7 @@ class PlayerSerializer(serializers.ModelSerializer):
     #     return ret
 
 # class InventorySerializer(serializers.ModelSerializer):
-#     typeReference = serializers.SerializerMethodField()
+#     typeReference = serializers.CharField(read_only=True)
 #     players_inventory = PlayerSerializer(many=True, read_only=True)
 #     class Meta:
 #         model = Inventory
@@ -87,7 +73,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 #         return obj.typeReference
 
 # class SlotSerializer(serializers.ModelSerializer):
-#     typeReference = serializers.SerializerMethodField()
+#     typeReference = serializers.CharField(read_only=True)
 #     name = serializers.SerializerMethodField()
 #     inventories = InventorySerializer(many=True, read_only=True)
 #     items_inventory = ItemSerializer(many=True, read_only=True)
@@ -102,7 +88,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 #         return obj.name
 
 # class EquipmentSerializer(serializers.ModelSerializer):
-#     typeReference = serializers.SerializerMethodField()
+#     typeReference = serializers.CharField(read_only=True)
 #     players_equipment = PlayerSerializer(many=True, read_only=True)
 #     items_head = ItemSerializer(many=True, read_only=True)
 #     items_neck = ItemSerializer(many=True, read_only=True)
@@ -139,25 +125,21 @@ class PlayerSerializer(serializers.ModelSerializer):
 #         return obj.typeReference
 
 class CurrencySerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     players = PlayerSerializer(many=True, read_only=True)
     class Meta:
         model = Currency
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
 
 class CharacterSerializer(serializers.ModelSerializer):
-    typeReference = serializers.SerializerMethodField()
+    typeReference = serializers.CharField(read_only=True)
     players = PlayerSerializer(many=True, read_only=True)
     items = ItemSerializer(many=True, read_only=True)
     class Meta:
         model = Character
         fields = '__all__'
-    
-    def get_typeReference(self, obj):
-        return obj.typeReference
+
     # def to_representation(self, instance):
     #     ret = super().to_representation(instance)
     #     players = ret.pop('players')

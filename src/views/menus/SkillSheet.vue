@@ -19,45 +19,46 @@
         <div class="absolute block mix-blend-overlay">Skills</div>
       </div>
     </div>
-    <div name="SkillCategories"
-    class='grid grid-cols-3 gap-2 m-1 p-1'
-    :style="{ 'height': calcSkillHeight(placeholderBasic, placeholderActive, placeholderPassive) * 3.1 + 'rem' }">
-    <div class="border-b grid grid-cols-1 text-[1.5rem] text-center h-10 p-1 mx-4">
-      <div class="flex justify-center w-full h-10 text-center">
-        <div class="absolute block text-blue-400 blur-sm">Basic</div>
-        <div class="absolute block text-blue-300">Basic</div>
-        <div class="absolute block mix-blend-overlay">Basic</div>
+    <div
+      name="SkillCategories"
+      class='grid grid-cols-3 gap-2 m-1 p-1'
+      :style="{ 'height': calcSkillHeight(placeholderBasic, placeholderActive, placeholderPassive) * 3.1 + 'rem' }">
+      <div class="border-b grid grid-cols-1 text-[1.5rem] text-center h-10 p-1 mx-4">
+        <div class="flex justify-center w-full h-10 text-center">
+          <div class="absolute block text-blue-400 blur-sm">Basic</div>
+          <div class="absolute block text-blue-300">Basic</div>
+          <div class="absolute block mix-blend-overlay">Basic</div>
+        </div>
+        <div v-for="(baseSkill, i) in placeholderBasic" :key="i">
+          <BaseTooltip :content="baseSkill[2]" placement="right">
+            <div class="text-sm py-2 h-10">{{ baseSkill[0] }}</div>
+          </BaseTooltip>
+        </div>
       </div>
-      <div v-for="(baseSkill, i) in placeholderBasic" :key="i">
-        <BaseTooltip :content="baseSkill[2]" placement="right">
-          <div class="text-sm py-2 h-10">{{ baseSkill[0] }}</div>
-        </BaseTooltip>
+      <div class="border-b grid grid-cols-1 text-[1.5rem] text-center h-10 p-1 mx-4">
+        <div class="flex justify-center w-full h-10 text-center">
+          <div class="absolute block text-blue-400 blur-sm">Active</div>
+          <div class="absolute block text-blue-300">Active</div>
+          <div class="absolute block mix-blend-overlay">Active</div>
+        </div>
+        <div v-for="(baseSkill, i) in placeholderActive" :key="i">
+          <BaseTooltip :content="baseSkill[2]" placement="right">
+            <div class="text-sm py-2 h-10">{{ baseSkill[0] }}</div>
+          </BaseTooltip>
+        </div>
       </div>
-    </div>
-    <div class="border-b grid grid-cols-1 text-[1.5rem] text-center h-10 p-1 mx-4">
-      <div class="flex justify-center w-full h-10 text-center">
-        <div class="absolute block text-blue-400 blur-sm">Active</div>
-        <div class="absolute block text-blue-300">Active</div>
-        <div class="absolute block mix-blend-overlay">Active</div>
+      <div class="border-b grid grid-cols-1 text-[1.5rem] text-center h-10 p-1 mx-4">
+        <div class="flex justify-center w-full h-10 text-center">
+          <div class="absolute block text-blue-400 blur-sm">Passive</div>
+          <div class="absolute block text-blue-300">Passive</div>
+          <div class="absolute block mix-blend-overlay">Passive</div>
+        </div>
+        <div v-for="(baseSkill, i) in placeholderPassive" :key="i">
+          <BaseTooltip :content="baseSkill[2]" placement="right">
+            <div class="text-sm py-2 h-10">{{ baseSkill[0] }}</div>
+          </BaseTooltip>
+        </div>
       </div>
-      <div v-for="(baseSkill, i) in placeholderActive" :key="i">
-        <BaseTooltip :content="baseSkill[2]" placement="right">
-          <div class="text-sm py-2 h-10">{{ baseSkill[0] }}</div>
-        </BaseTooltip>
-      </div>
-    </div>
-    <div class="border-b grid grid-cols-1 text-[1.5rem] text-center h-10 p-1 mx-4">
-      <div class="flex justify-center w-full h-10 text-center">
-        <div class="absolute block text-blue-400 blur-sm">Passive</div>
-        <div class="absolute block text-blue-300">Passive</div>
-        <div class="absolute block mix-blend-overlay">Passive</div>
-      </div>
-      <div v-for="(baseSkill, i) in placeholderPassive" :key="i">
-        <BaseTooltip :content="baseSkill[2]" placement="right">
-          <div class="text-sm py-2 h-10">{{ baseSkill[0] }}</div>
-        </BaseTooltip>
-      </div>
-    </div>
   </div>
   <div class="border-y col-span-3 text-sm text-center">Unspent Skillpoints: {{ c.skillPoints }}</div>
   <div class="flex justify-center">

@@ -57,7 +57,8 @@ const chapterStore = useChapterStore()
 
 const props = defineProps({
   p: {
-    type: Object
+    type: Object,
+    default: () => ({})
   }
 })
 

@@ -139,7 +139,49 @@ function assumeInitialState () {
 function assumeEventState (event) {
   console.log('Processing: new event!', event.attributes)
   console.log(event)
+  for (const relevantEvent of event.relatedEvent) {
+    switch (relevantEvent.typeReference) {
+      case 'item':
+        handleItem(relevantEvent)
+        break
+      default:
+        break
+    }
+  }
 }
+
+
+function handleItem (item) {
+  if (item.inInventory) {
+    if (!chapterStore.currentInventory.includes(item)) {
+      chapterStore.currentInventory.append(item)
+    }
+  }
+  switch (item.slot) {
+    case 'Hand':
+      if (item.isEquipped) {
+        if (!chapterStore.currentEquipment.hands.includes(item)) {
+          if (chapterStore.currentEquipment.hands.length < 2) {
+            chapterStore.currentEquipment.hands.push(item)
+            console.log(chapterStore.currentEquipment.hands)
+          } else {
+            throw new Error('Too many items equipped.')
+          }
+        } else {
+          throw new Error('Item already equipped.')
+        }
+      }
+      // x equip and put in inventory
+      //   o check the name of the item --> if its already there, should be replaced
+      // o unequip and remove from inventory
+      //   o check the name of the item --> if its already there, should be replaced
+      // o all other slots, same logic
+      break
+    default:
+      break
+  }
+}
+
 
 function findClosestLower (dictionary, searchValue) {
   const array = Object.keys(dictionary).map(Number)
@@ -159,68 +201,6 @@ function findClosestLower (dictionary, searchValue) {
 
   return dictionary[array[right]]
 }
-
-// function findClosestKey(dictionary, searchValue) {
-//   const keys = Object.keys(dictionary).map(Number)
-//   let left = 0
-//   let right = keys.length - 1
-//   while (left <= right) {
-//     const middle = Math.floor((left + right) / 2)
-//     const diff = Math.abs(keys[middle] - searchValue)
-//     if (keys[middle] === searchValue && diff < 200) {
-//       return dictionary[keys[middle]]
-//     } else if (keys[middle] > searchValue) {
-//       right = middle - 1
-//     } else {
-//       left = middle + 1
-//     }
-//     if (keys[middle] >= searchValue && keys[middle - 1] <= searchValue) {
-//       if (Math.min(Math.abs(keys[middle] - searchValue), Math.abs(keys[middle - 1] - searchValue)) < 200) {
-//         return (searchValue - keys[middle - 1] < keys[middle] - searchValue) ? dictionary[keys[middle - 1]] : dictionary[keys[middle]]
-//       }
-//     }
-//   }
-//   if (right < 0 && Math.abs(keys[right + 1] - searchValue) < 200) {
-//     return dictionary[keys[left]]
-//   } else if (left >= keys.length && Math.abs(keys[left - 1] - searchValue) < 200) {
-//     return dictionary[keys[right]]
-//   } else if (Math.min(Math.abs(keys[right] - searchValue), Math.abs(keys[left] - searchValue)) < 200) {
-//     return searchValue - keys[right] < keys[left] - searchValue ? dictionary[keys[right]] : dictionary[keys[left]]
-//   } else {
-//     return null
-//   }
-// }
-
-
-// function findClosestKey(dictionary, searchValue) {
-//   const keys = Object.keys(dictionary).map(Number)
-//   let left = 0
-//   let right = keys.length - 1
-//   while (left <= right) {
-//     const middle = Math.floor((left + right) / 2)
-//     // console.log('testing if', keys[middle], ' > ', searchValue)
-//     if (keys[middle] === searchValue) {
-//       return dictionary[keys[middle]]
-//     } else if (keys[middle] > searchValue) {
-//       right = middle - 1
-//     } else {
-//       left = middle + 1
-//     }
-//     if (keys[middle] >= searchValue && keys[middle - 1] <= searchValue) {
-//       return (searchValue - keys[middle - 1] < keys[middle] - searchValue) ? dictionary[keys[middle - 1]] : dictionary[keys[middle]]
-//     }
-//   }
-//   if (right < 0) {
-//     return dictionary[keys[left]]
-//   } else if (left >= keys.length) {
-//     return dictionary[keys[right]]
-//   } else if (searchValue - keys[right] < keys[left] - searchValue) {
-//     return dictionary[keys[right]]
-//   } else {
-//     return dictionary[keys[left]]
-//   }
-// }
-
 
 function insertSurfaceData (obj, key) {
   const newObj = {}
