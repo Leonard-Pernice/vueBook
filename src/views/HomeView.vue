@@ -144,44 +144,106 @@ function assumeEventState (event) {
       case 'item':
         handleItem(relevantEvent)
         break
+      case 'monster':
+        handleKill(relevantEvent)
+        break
+      case 'levelup':
+        break
+      case 'quest':
+        handleQuest(relevantEvent)
+        break
+      case 'achievement':
+        handleAchievement(relevantEvent)
+        break
       default:
         break
     }
   }
 }
 
+function handleAchievement (achievement) {
+  if (chapterStore.currentAchievements.includes(achievement)) {
+    return
+  } else {
+    chapterStore.currentAchievements.push(achievement)
+  }
+  console.log('Updating achievements: ', chapterStore.currentAchievements, ' with achievement: ', achievement)
+}
+
+function handleQuest (quest) {
+  const questIndex = chapterStore.currentQuests.findIndex(q => q.name === quest.name)
+  if (questIndex) {
+    chapterStore.currentQuests[questIndex] = quest
+  } else {
+    chapterStore.currentQuests.push(quest)
+  }
+  console.log('Updating quests: ', chapterStore.currentQuests, ' with quest: ', quest)
+}
+
+function handleKill (player) {
+  chapterStore.currentPlayer = player
+  console.log('Updating player: ', chapterStore.currentPlayer)
+}
 
 function handleItem (item) {
   if (item.inInventory) {
     if (!chapterStore.currentInventory.includes(item)) {
-      chapterStore.currentInventory.append(item)
+      chapterStore.currentInventory.push(item)
     }
   }
-  switch (item.slot) {
-    case 'Hand':
-      if (item.isEquipped) {
-        if (!chapterStore.currentEquipment.hands.includes(item)) {
-          if (chapterStore.currentEquipment.hands.length < 2) {
-            chapterStore.currentEquipment.hands.push(item)
-            console.log(chapterStore.currentEquipment.hands)
-          } else {
-            throw new Error('Too many items equipped.')
-          }
-        } else {
-          throw new Error('Item already equipped.')
-        }
-      }
-      // x equip and put in inventory
-      //   o check the name of the item --> if its already there, should be replaced
-      // o unequip and remove from inventory
-      //   o check the name of the item --> if its already there, should be replaced
-      // o all other slots, same logic
-      break
-    default:
-      break
+  if (!item.inInventory && getNames(chapterStore.currentInventory).includes(item.name)) {
+    chapterStore.currentInventory = chapterStore.currentInventory.filter(remain => remain !== item)
   }
+  let slotCounts = {
+    "Head": 0,
+    "Neck": 0,
+    "Shoulders": 0,
+    "Back": 0,
+    "Chest": 0,
+    "Wrist": 0,
+    "Waist": 0,
+    "Underpants": 0,
+    "Legs": 0,
+    "Feet": 0,
+    "Hand": -1,
+    "Ring": -9,
+    "Trinket": 0,
+    "Ranged": 0,
+    "Earring": -1
+  }
+  chapterStore.currentEquipment.forEach(equip => {
+    const slot = equip.slot
+    if (slot in slotCounts) {
+      slotCounts[slot]++
+    } else { throw new Error(`This slot does not exist, ${equip}`)}
+  })
+  console.log(chapterStore.currentEquipment)
+  console.log('Slot counts: ', slotCounts)
+  if (item.isEquipped) {
+    if (!chapterStore.currentEquipment.includes(item)) {
+      if (slotCounts[item.slot] <= 0) {
+        const itemIndex = chapterStore.currentEquipment.findIndex(equip => equip.name === item.name)
+        if (itemIndex) {
+          chapterStore.currentEquipment[itemIndex] = item
+        } else {
+          chapterStore.currentEquipment.push(item)
+        }
+      } else { throw new Error(`Too many items of slot "${item.slot}" already equipped.`)}
+    }
+  }
+  if (!item.isEquipped && getNames(chapterStore.currentEquipment).includes(item.name)) {
+    chapterStore.currentEquipment = chapterStore.currentEquipment.filter(remain => remain !== item)
+  }
+  console.log('Updating inventory: ', chapterStore.currentInventory, ' with item: ', item)
+  console.log('Updating equipment: ', chapterStore.currentEquipment, ' with item: ', item)
+  // PROBLEM: 
+  // items get replaced in equipment store, not added. No idea why.
 }
 
+function getNames(arr) {
+  let names = arr.map(obj => obj.name);
+  return names;
+}
 
 function findClosestLower (dictionary, searchValue) {
   const array = Object.keys(dictionary).map(Number)

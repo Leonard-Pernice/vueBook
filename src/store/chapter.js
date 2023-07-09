@@ -22,30 +22,14 @@ export const useChapterStore = defineStore('chapter', {
     items: Object,
     currencies: Object,
     currentPlayer: Object,
-    currentStats: Object,
-    currentSkills: Object,
-    currentQuests: Object,
-    currentAchievements: Object,
-    currentPact: Object,
-    currentParagon: Object,
+    currentStats: [],
+    currentSkills: [],
+    currentQuests: [],
+    currentAchievements: [],
+    currentPact: [],
+    currentParagon: [],
     currentInventory: [],
-    currentEquipment: {
-      head: Object,
-      neck: Object,
-      shoulders: Object,
-      back: Object,
-      chest: Object,
-      wrist: Object,
-      waist: Object,
-      underpants: Object,
-      legs: Object,
-      feet: Object,
-      hands: [],
-      ranged: Object,
-      trinket: Object,
-      rings: [],
-      earrings: []
-    }
+    currentEquipment: []
   }),
   actions: {
     changeChapter (number) {
