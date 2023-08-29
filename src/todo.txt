@@ -12,7 +12,7 @@ System
     o create function inside the respective view to post this chapter to django
   x create django models and serializers for all the character variables, quests, npcs, etc.
     o stats
-      o implement stat maximum percentile
+      o implement stat maximum percentile <-- this can be an auto field or @property in the backend, since no manual input is needed
       o create models for "human", "elf", male, female, etc.
     o paragon stuff
     o pact stuff
@@ -28,7 +28,7 @@ System
   o create django view to export a list of all chapters to link them to the navigation menu via v-for
   o create functions in loaded() method or whatever it is to jump back to last position after switch
   o EVENT LOADING
-    o whenever an event is scrolled past, the function just goes through all the end points in the chapter JSON and loads the ones closest to the respective referenceToLastRelevantEvent
+    x whenever an event is scrolled past, the function just goes through all the end points in the chapter JSON and loads the ones closest to the respective referenceToLastRelevantEvent
     o the topnav should be hidden after a dynamic distance value dependent on the users screen size, not a flat value
   o think about mobile implementations?
   o create loading icon for signaling when page is still loading

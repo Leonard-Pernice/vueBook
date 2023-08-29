@@ -164,7 +164,7 @@
   <router-view />
 
   <SidebarLeft v-if=navigationStore.showChapterNav />
-  <SidebarRight v-if=navigationStore.showResBars />
+  <StatBars v-if=chapterStore.currentStats.length />
 </template>
 
 <script setup>
@@ -172,14 +172,17 @@ import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 
 import SidebarLeft from '@/components/SidebarLeft.vue'
-import SidebarRight from '@/components/SidebarRight.vue'
+// import SidebarRight from '@/components/SidebarRight.vue'
+import StatBars from '@/components/StatBars.vue'
 
 import { useNavigationStore } from '@/store/index'
 import { useAccountStore } from '@/store/account'
+import { useChapterStore } from './store/chapter'
 // import axios from 'axios'
 
 const router = useRouter()
 
+const chapterStore = useChapterStore()
 const navigationStore = useNavigationStore()
 const accountStore = useAccountStore()
 

@@ -8,36 +8,12 @@ export const useNavigationStore = defineStore('nav', {
     showBackButton: false,
     showResBars: true,
     showChapterNav: false,
-    bars: [
-      {
-        show: true,
-        total: 50,
-        current: 30,
-        color: 'red',
-        type: 'HPsideBar'
-      },
-      {
-        show: true,
-        total: 4,
-        current: 2,
-        color: 'green',
-        type: 'APsideBar'
-      },
-      {
-        show: true,
-        total: 0,
-        current: 0,
-        color: 'pink',
-        type: 'SPsideBar'
-      },
-      {
-        show: false,
-        total: 0,
-        current: 0,
-        color: 'blue',
-        type: 'MPsideBar'
-      }
-    ]
+    bars: {
+      'Vitality': false,
+      'Momentum': false,
+      'Charisma': false,
+      'Spirit': false
+    }
   }),
   actions: {
     hideTopNav () {
