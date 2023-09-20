@@ -28,5 +28,9 @@ python shit...
   restart terminal
   activate new env
   pip install the dependencies
+    djoser
+    django-cors-headers
+    djangorestframework
+    django-rest-authtoken
   
   

@@ -1,9 +1,9 @@
 <template>
-  <div class="fixed h-screen w-4 z-10 top-0 right-0 overflow-x-visible overflow-y-hidden bg-black" v-if="navigationStore.showResBars">
+  <div class="fixed h-screen w-4 z-10 top-0 right-0 overflow-x-visible overflow-y-hidden bg-black">
     <div class="flex align-middle justify-center flex-col h-full">
       <div
         class="flex self-center mx-0 h-auto"
-        v-for="(stat, i) in chapterStore.currentStats"
+        v-for="(stat, i) in chapterStore.current.stats"
         :key="i"
         v-show="navigationStore.bars[stat.name]"
       >

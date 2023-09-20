@@ -1,0 +1,113 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore Python cache directories
+__pycache__/
+
+# Ignore database files
+db.sqlite3
+
+# Ignore Node.js modules
+node_modules/
+
+# Ignore migration files
+book_django/bookDB/migrations/
+
+# Ignore Django management commands directory
+book_django/bookDB/management/
+
+# Ignore specific compiled Python files
+**/__pycache__/*.cpython-311.pyc
+
+# Ignore JSON chapters directory
+book_django/json_chapters/
+
+# Typical entries in a Python project
+# Ignore virtual environment
+venv/
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore package lock files
+package-lock.json
+yarn.lock
+
+# Ignore system and temporary files
+*.log
+*.swp
+.DS_Store
+Thumbs.db
+
+# Compiled Code
+*.exe
+*.dll
+*.so
+*.o
+*.pyc
+*.class
+*.obj
+
+# Dependency and Build Files
+package-lock.json
+yarn.lock
+node_modules/
+build/
+dist/
+*.js
+*.css
+*.min.js
+
+# Editor and IDE Files
+.vscode/
+.idea/
+*~
+*.swp
+
+# Temporary and System Files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Configuration Files
+.env
+*.config
+.env.local
+.env.secret
+
+# Generated and Auto-generated Files
+docs/
+*.generated.*
+
+# Log and Debug Files
+*.log
+*.log.*
+
+# User-Specific Files
+.userconfig
+.project.user
+
+# Database Files
+*.db
+*.sqlite
+*.sql
+
+# Miscellaneous
+*.bak
+.cache/
+cache/
+
+# Image Files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.tiff
+*.ico
+*.webp

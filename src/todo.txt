@@ -1,4 +1,12 @@
 System
+  o change power to difficulty in the json chapters to match the new exp calculation
+  o changed options.content to correctly refer to the name of the achievment. change for quest and others as well and adapt in jsons
+  o keep convention of designating specific characters at ALL events, even if Kale is default
+  o ?? create functions for all change events to be reused everywhere
+    o statChange => player, stat, changeValue (bar/inc/train); calcExp at negatives, recover at positives, warn at results below zero, default at max value for reset
+    o skillUse => player, skill, statChange; calcExp for skill
+    o expChange => player, source; calcExp, sendLvlUp (statChange to reset statBars)
+    o 
   x create button to upload chapter in json format
     x adapt the function to account for kill syntax and other events:
       o introduce character/player

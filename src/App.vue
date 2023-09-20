@@ -164,11 +164,11 @@
   <router-view />
 
   <SidebarLeft v-if=navigationStore.showChapterNav />
-  <StatBars v-if=chapterStore.currentStats.length />
+  <StatBars />
 </template>
 
 <script setup>
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import SidebarLeft from '@/components/SidebarLeft.vue'
@@ -211,6 +211,10 @@ onBeforeMount(() => {
   // axios.defaults.xsrfCookieName = 'csrftoken'
   // axios.defaults.withCredentials = true
   accountStore.checkToken()
+})
+
+onMounted(async () => {
+  await chapterStore.fetchData()
 })
 
 function accountPage () {

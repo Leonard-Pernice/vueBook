@@ -53,7 +53,7 @@ async function getCurrentChapter () {
       document.title = 'Book | ' + chapterStore.chapter.name
       chapterStore.currentChapter = chapterStore.chapter.name.replace(/[^0-9]/g, '')
       console.log('Current Chapter is: ', chapterStore.currentChapter)
-      assumeInitialState()
+      chapterStore.assumeInitialState()
     })
     .catch(error => {
       console.log(error)
@@ -90,7 +90,7 @@ useEventListener(document, 'scroll', () => {
     
     const indexPastEvent = pastEvents.findIndex(item => item.id === latestParagraph.id)
     if (indexPastEvent >= 0 && indexPastEvent < pastEvents.length - 1) {
-      assumeInitialState()
+      chapterStore.assumeInitialState()
       const deProcessedEvents = pastEvents.splice(indexPastEvent + 1, pastEvents.length)
       futureEvents.unshift(...deProcessedEvents)
       for (const event in pastEvents) {
@@ -104,40 +104,10 @@ useEventListener(document, 'scroll', () => {
     //     -> then I only have to change the pointer, not all the values inside
 
   } else if (latestParagraph === undefined && pastEvents.length > 0) {
-    assumeInitialState()
+    chapterStore.assumeInitialState()
     futureEvents.unshift(pastEvents.pop())
   }
 })
-
-function assumeInitialState () {
-  console.log('INITIALIZING!')
-  const keys = Object.keys(chapterStore.players)
-  chapterStore.currentPlayer = chapterStore.players[keys[0]]
-  const listOfStates = [
-    [chapterStore.currentStats, chapterStore.stats],
-    [chapterStore.currentSkills, chapterStore.skills],
-    [chapterStore.currentQuests, chapterStore.quests],
-    [chapterStore.currentAchievements, chapterStore.achievements],
-    [chapterStore.currentPact, chapterStore.pacts],
-    [chapterStore.currentParagon, chapterStore.paragons]
-  ]
-  const firstParagraph = chapterStore.paragraphs[getLowestNumberedParagraph(chapterStore.paragraphs)].id
-  for (const state of listOfStates) {
-    state[0] = []
-    for (const key in state[1]) {
-      const newEvent = state[1][key]
-      if (newEvent.referenceParagraph === firstParagraph) {
-        state[0].push(newEvent)
-      }
-    }
-    console.log(state[0])
-  }
-  for (const stat of chapterStore.currentStats) {
-    showStat(stat)
-    console.log(navigationStore.bars)
-  }
-  // HP bar etc. don't get rendered at start of chapter even though they should. not sure why...
-}
 
 function assumeEventState (event) {
   console.log('Processing: new event!', event.attributes)
@@ -168,35 +138,36 @@ function assumeEventState (event) {
 }
 
 function handleStat (stat) {
-  const statIndex = chapterStore.currentStats.findIndex(s => s.name === stat.name)
-  if (chapterStore.currentStats.includes(stat)) {
+  const statIndex = chapterStore.current.stats.findIndex(s => s.name === stat.name)
+  showStat(stat)
+  if (chapterStore.current.stats.includes(stat)) {
     return
   } else {
     if (statIndex >= 0) {
-      chapterStore.currentStats[statIndex] = stat
+      chapterStore.current.stats[statIndex] = stat
       console.log('Updating stats with: ', stat.name)
     } else {
-      chapterStore.currentStats.push(stat)
+      chapterStore.current.stats.push(stat)
       console.log('Updating stats with: ', stat.name)
     }
   }
 }
 
 function handleAchievement (achievement) {
-  if (chapterStore.currentAchievements.includes(achievement)) {
+  if (chapterStore.current.achievements.includes(achievement)) {
     return
   } else {
-    chapterStore.currentAchievements.push(achievement)
+    chapterStore.current.achievements.push(achievement)
   }
   console.log('Updating achievements with achievement: ', achievement.name)
 }
 
 function handleQuest (quest) {
-  const questIndex = chapterStore.currentQuests.findIndex(q => q.name === quest.name)
+  const questIndex = chapterStore.current.quests.findIndex(q => q.name === quest.name)
   if (questIndex >= 0) {
-    chapterStore.currentQuests[questIndex] = quest
+    chapterStore.current.quests[questIndex] = quest
   } else {
-    chapterStore.currentQuests.push(quest)
+    chapterStore.current.quests.push(quest)
   }
   console.log('Updating quests with quest: ', quest.name)
 }
@@ -209,13 +180,13 @@ function handleKill (player) {
 function handleItem (item) {
   // Checking Inventory
   if (item.inInventory) {
-    if (!chapterStore.currentInventory.includes(item)) {
-      chapterStore.currentInventory.push(item)
+    if (!chapterStore.current.inventory.includes(item)) {
+      chapterStore.current.inventory.push(item)
       console.log('Updating inventory with item: ', item.name)
     }
   }
-  if (!item.inInventory && getNames(chapterStore.currentInventory).includes(item.name)) {
-    chapterStore.currentInventory = chapterStore.currentInventory.filter(remain => remain !== item)
+  if (!item.inInventory && getNames(chapterStore.current.inventory).includes(item.name)) {
+    chapterStore.current.inventory = chapterStore.current.inventory.filter(remain => remain !== item)
   }
   // Checking Equipment
   let slotCounts = {
@@ -235,7 +206,7 @@ function handleItem (item) {
     "Ranged": 0,
     "Earring": -1
   }
-  chapterStore.currentEquipment.forEach(equip => {
+  chapterStore.current.equipment.forEach(equip => {
     const slot = equip.slot
     if (slot in slotCounts) {
       slotCounts[slot]++
@@ -243,21 +214,21 @@ function handleItem (item) {
   })
   console.log('Slot counts: ', slotCounts)
   if (item.isEquipped) {
-    if (!chapterStore.currentEquipment.includes(item)) {
+    if (!chapterStore.current.equipment.includes(item)) {
       if (slotCounts[item.slot] <= 0) {
-        const itemIndex = chapterStore.currentEquipment.findIndex(equip => equip.name === item.name)
+        const itemIndex = chapterStore.current.equipment.findIndex(equip => equip.name === item.name)
         if (itemIndex >= 0) {
-          chapterStore.currentEquipment[itemIndex] = item
+          chapterStore.current.equipment[itemIndex] = item
           console.log('Updating equipment with item: ', item.name)
         } else {
-          chapterStore.currentEquipment.push(item)
+          chapterStore.current.equipment.push(item)
           console.log('Updating equipment with item: ', item.name)
         }
       } else { throw new Error(`Too many items of slot "${item.slot}" already equipped. Cannot equip ${item}`)}
     }
   }
-  if (!item.isEquipped && getNames(chapterStore.currentEquipment).includes(item.name)) {
-    chapterStore.currentEquipment = chapterStore.currentEquipment.filter(remain => remain !== item)
+  if (!item.isEquipped && getNames(chapterStore.current.equipment).includes(item.name)) {
+    chapterStore.current.equipment = chapterStore.current.equipment.filter(remain => remain !== item)
   }
 }
 

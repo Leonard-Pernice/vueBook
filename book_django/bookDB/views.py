@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
+import math
 
 from .serializers import *
 
@@ -300,6 +301,10 @@ class CreateStatView(APIView):
             increased = serializer.data.get('increased')
             trained = serializer.data.get('trained')
             bar = serializer.data.get('bar')
+            # Sanity Checking the Bar:
+            theoretic_total = math.floor(float(base) + float(increased) + float(trained))
+            if float(bar) > theoretic_total:
+                return Response({f'Bad value: value of bar is too high by {float(bar) - theoretic_total}!'}, status = status.HTTP_400_BAD_REQUEST)
             queryset = Stat.objects.filter(Q(name = name) & Q(player = player) & Q(referenceParagraph = referenceParagraph))
             if queryset.exists():
                 stat = queryset[0]

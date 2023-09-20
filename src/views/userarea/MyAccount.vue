@@ -299,7 +299,12 @@ function createTextParagraph (formData, index) {
 function createKillEventParagraph (formData, index) {
   const text = entries.value.content[index][1]
   const options = entries.value.content[index][0]
-  options.power = options.power.replace(/[^0-9]/g, '')
+  if (options.power) {
+    options.power = options.power.replace(/[^0-9]/g, '')
+  }
+  if (options.difficulty) {
+    options.difficulty = options.difficulty.replace(/[^0-9]/g, '')
+  }
   options.tier = options.tier.replace(/[^0-9]/g, '')
   console.log(`Processing a kill paragraph for a ${options.type}.`)
   const playerName = options.character ? options.character : 'Kale' // not to be confused with the
@@ -357,12 +362,12 @@ function createKillEventParagraph (formData, index) {
           if (options.type === 'achievement') {
             const achievementFormData = {
               player: newPlayer.id,
-              name: options.content,
+              name: options.name,
               referenceParagraph: killParagraph,
               referenceToLastRelevantEvent: lastPlayerReference.id, // This is an unnecessary field...
               description: options.description,
               tier: options.tier,
-              difficulty: options.power,
+              difficulty: options.difficulty,
               reward: options.reward
             }
             console.log('Trying to post a new achievement.')
@@ -1256,6 +1261,7 @@ function navigateToCurrentChapter () {
 function calcExp (msg) {
   const lvl = parseInt(msg.level)
   const power = parseInt(msg.power)
+  const difficulty = parseInt(msg.difficulty)
   const tier = parseInt(msg.tier)
   const typ = msg.type
   const base = 1.00
@@ -1267,9 +1273,9 @@ function calcExp (msg) {
     switch (tier) {
       case 1:
         console.log('We are trying to post a monster kill: ', msg)
-        console.log('level: ', lvl)
-        console.log('power: ', power)
-        console.log('tier: ', tier)
+        // console.log('level: ', lvl)
+        // console.log('power: ', power)
+        // console.log('tier: ', tier)
         reward = base * Math.pow((power * 3) / (Math.pow(lvl, 0.5) + 10) + 6, 6) / Math.pow(lvl * 2, 2) / 900000
         return reward.toFixed(4)
       default:
@@ -1278,9 +1284,9 @@ function calcExp (msg) {
     }
   } else if (typ === 'achievement' || typ === 'quest') {
     console.log('We are trying to post an achievement or quest: ', msg)
-    console.log('level: ', lvl)
-    console.log('power: ', power)
-    console.log('tier: ', tier)
+    // console.log('level: ', lvl)
+    // console.log('difficulty: ', difficulty)
+    // console.log('tier: ', tier)
     if (lvl === 0) {
       return base
     }
@@ -1291,13 +1297,13 @@ function calcExp (msg) {
           return reward
         }
         reward = base / 2 / Math.pow(lvl, 2)
-        console.log('Calculated exp is: ', reward)
+        // console.log('Calculated exp is: ', reward)
         return reward
       case 1: // power = difficulty!
-        reward = base * base / 3 * Math.pow(power, 2) / Math.pow(lvl, 2) / 45 * lvl
+        reward = base * base / 3 * Math.pow(difficulty, 2) / Math.pow(lvl, 2) / 45 * lvl
         return reward
       default:
-        reward = base * base * Math.pow(power, 2) / Math.pow(lvl, 2)
+        reward = base * base * Math.pow(difficulty, 2) / Math.pow(lvl, 2)
         return reward
     }
   } else {
@@ -1319,15 +1325,15 @@ function calcProgressExp (statLevel, amountSpent, stat) {
   // }
   reward = base * Math.pow((cost * 3) / (Math.pow(statLevel, 0.1) + 5) + 0.1, 2.1) / Math.pow((statLevel + 1) * 2, 2) / 10
   const newLevel = reward / (1 + reward) * spentPercentage + Math.log10(statLevel + 2) * spentPercentage * 1 / (1 + statLevel)
-  console.log('Level: ', statLevel)
-  console.log('Amount: ', cost)
-  console.log('Base: ', parseInt(stat.base))
-  console.log('Increased: ', parseInt(stat.increased))
-  console.log('Trained: ', parseFloat(stat.trained))
-  console.log('Total: ', total)
-  console.log('Percentage: ', spentPercentage)
-  console.log('reward: ', reward)
-  console.log('newLevel: ', newLevel)
+  // console.log('Level: ', statLevel)
+  // console.log('Amount: ', cost)
+  // console.log('Base: ', parseInt(stat.base))
+  // console.log('Increased: ', parseInt(stat.increased))
+  // console.log('Trained: ', parseFloat(stat.trained))
+  // console.log('Total: ', total)
+  // console.log('Percentage: ', spentPercentage)
+  // console.log('reward: ', reward)
+  // console.log('newLevel: ', newLevel)
   return statLevel + newLevel
 }
 
@@ -1372,7 +1378,7 @@ function findCost (options) {
   cost = Object.hasOwn(options, 'ap') ? options.ap : cost
   cost = Object.hasOwn(options, 'mp') ? options.mp : cost
   cost = Object.hasOwn(options, 'st') ? options.st : cost
-  console.log('Cost: ', cost)
+  // console.log('Cost: ', cost)
   return parseInt(cost)
 }
 

@@ -16,6 +16,17 @@ export const useNavigationStore = defineStore('nav', {
     }
   }),
   actions: {
+    showStat (stat) {
+      const validBars = ['Vitality', 'Momentum', 'Charisma', 'Spirit']
+      if (validBars.includes(stat.name) && this.calcTotal(stat) > 0) {
+        this.bars[stat.name] = true
+      } else {
+        this.bars[stat.name] = false
+      }
+    },
+    calcTotal (stat) {
+      return Math.floor(stat.base + stat.increased + Math.floor(parseFloat(stat.trained)))
+    },
     hideTopNav () {
       this.showTopNav = false
     },
