@@ -100,7 +100,7 @@ useEventListener(document, 'scroll', () => {
 
     // Next Steps:
     //   o create component for showing equipment
-    //   o simplify the process by adapting everything to the same structure as the database
+    //   o simplify the components by adapting everything to the same structure as the database
     //     -> then I only have to change the pointer, not all the values inside
 
   } else if (latestParagraph === undefined && pastEvents.length > 0) {
@@ -111,7 +111,7 @@ useEventListener(document, 'scroll', () => {
 
 function assumeEventState (event) {
   console.log('Processing: new event!', event.attributes)
-  console.log(event)
+  // console.log(event)
   for (const relevantEvent of event.relatedEvent) {
     switch (relevantEvent.typeReference) {
       case 'item':

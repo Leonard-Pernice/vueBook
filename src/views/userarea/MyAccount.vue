@@ -71,6 +71,7 @@ const stats = ref({
   int: 'Intuition',
   wil: 'Willpower',
   atr: 'Attractiveness'
+  // Cognisance, aptitude, conductance, capacity, fluidity (of mana through body)
 })
 // const existingChapters = ref([])
 

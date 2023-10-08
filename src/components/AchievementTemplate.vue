@@ -12,17 +12,14 @@
     </div>
   </div>
   <Transition name="slide-fade">
-    <div ref="questReference" v-if="isOpen" class="bg-transparent text-white overflow-hidden">
+    <div ref="achievementReference" v-if="isOpen" class="bg-transparent text-white overflow-hidden">
       <div class="grid grid-cols-2 border text-sm text-center overflow-hidden">
-        <div class="col-span-2 p-2"><GlowText :content="props.a.desc"></GlowText></div>
+        <div class="col-span-2 p-2"><GlowText :content="props.a.description"></GlowText></div>
         <div class="col-span-2 border-b mb-1"></div>
         <div class="border-r h-5"><GlowText :content="'Tier: ' + props.a.tier"></GlowText></div>
-        <div class="border-l h-5"><GlowText :content="'Difficulty: ' + props.a.diff"></GlowText></div>
-        <div class="col-span-2 border-y h-5"><GlowText :content="'Experience: ' + calcExp()"></GlowText></div>
-        <div class="border h-5"><GlowText :content="props.a.rewTitle1"></GlowText></div>
-        <div class="border h-5"><GlowText :content="props.a.rewTitle2"></GlowText></div>
-        <div class="border min-h-[20px]"><GlowText :content="props.a.rew1"></GlowText></div>
-        <div class="border min-h-[20px]"><GlowText :content="props.a.rew2"></GlowText></div>
+        <div class="border-l h-5"><GlowText :content="'Difficulty: ' + props.a.difficulty"></GlowText></div>
+        <div class="col-span-2 border-y h-5"><GlowText :content="'Experience: ' + achievementEXP"></GlowText></div>
+        <div class="border col-span-2 min-h-[20px]"><GlowText :content="props.a.reward"></GlowText></div>
       </div>
     </div>
   </Transition>
@@ -31,11 +28,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { calcExp } from '@/help/extraFunctions'
 import GlowText from '@/components/GlowText.vue'
+import { useChapterStore } from '@/store/chapter'
 
-function calcExp () {
-  return 50
-}
+const chapterStore = useChapterStore()
 
 const props = defineProps({
   a: {
@@ -46,11 +43,18 @@ const props = defineProps({
 
 const isOpen = ref(true)
 
-const questReference = ref()
+const achievementEXP = calcExp({
+  level: chapterStore.currentPlayer.level,
+  tier: props.a.tier,
+  power: props.a.difficulty,
+  type: 'achievement'
+})
+
+const achievementReference = ref()
 const computedHeight = { height: 0 }
 
 onMounted(() => {
-  const height = window.getComputedStyle(questReference.value, null).getPropertyValue('height')
+  const height = window.getComputedStyle(achievementReference.value, null).getPropertyValue('height')
   computedHeight.height = `${height}px`
   isOpen.value = false
 })

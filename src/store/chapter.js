@@ -23,6 +23,7 @@ export const useChapterStore = defineStore('chapter', {
     equipments: Object,
     items: Object,
     currencies: Object,
+    currentCharacter: Object,
     currentPlayer: Object,
     // currentStats: [],
     // currentSkills: [],
@@ -80,10 +81,11 @@ export const useChapterStore = defineStore('chapter', {
       while (!this.dataLoaded) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-    
+      // INITIALIZE
       console.log('INITIALIZING!')
       const keys = Object.keys(this.players)
       this.currentPlayer = this.players[keys[0]]
+      this.currentCharacter = this.getCharacter(this.currentPlayer.character)
       const firstParagraph = this.paragraphs[this.getLowestNumberedParagraph()].id
       for (const category in this.current) {
         const corresponding = this.getCorrespondingObject(category)
@@ -114,6 +116,14 @@ export const useChapterStore = defineStore('chapter', {
       })
   
       return minKey
+    },
+    getCharacter (id) {
+      for (const character in this.characters) {
+        if (character.id === id) {
+          return character
+        }
+      }
+      return null
     }
   },
   getters: {
