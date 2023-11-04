@@ -145,6 +145,7 @@ class Character(models.Model):
 
 class Player(models.Model):
     name = models.CharField(default="", max_length=255)
+    chapter = models.ForeignKey(Chapter, related_name='chapter_players', on_delete=models.CASCADE)
     character = models.ForeignKey(Character, related_name='players', on_delete=models.CASCADE)
     referenceParagraph = models.IntegerField(default=1)
     referenceToLastRelevantEvent = models.IntegerField(default=0)
@@ -196,8 +197,8 @@ class Player(models.Model):
 
         return thumbnail
 
-
 class Relationship(models.Model):
+    chapter = models.ForeignKey(Chapter, related_name='chapter_relationships', on_delete=models.CASCADE)
     player = models.ForeignKey(Player, related_name='relationship', on_delete=models.CASCADE)
     npc = models.ForeignKey(Character, related_name='relationship', on_delete=models.CASCADE)
     referenceParagraph = models.IntegerField(default=1)
@@ -217,6 +218,7 @@ class Relationship(models.Model):
 
 class Stat(models.Model):
     name = models.CharField(default="", max_length=255)
+    chapter = models.ForeignKey(Chapter, related_name='chapter_stats', on_delete=models.CASCADE)
     player = models.ForeignKey(Player, related_name='stats', on_delete=models.CASCADE)
     referenceParagraph = models.IntegerField(default=1)
     referenceToLastRelevantEvent = models.IntegerField(default=0)
@@ -225,6 +227,7 @@ class Stat(models.Model):
     increased = models.IntegerField(default=0)
     trained = models.DecimalField(decimal_places = 2, max_digits = 16, default=0)
     bar = models.IntegerField(default=50)
+    idealValue = models.CharField(default='max', max_length=10)
 
     @property
     def typeReference(self):
@@ -235,6 +238,7 @@ class Stat(models.Model):
 
 class Skill(models.Model):
     name = models.CharField(default="", max_length=255)
+    chapter = models.ForeignKey(Chapter, related_name='chapter_skills', on_delete=models.CASCADE)
     player = models.ForeignKey(Player, related_name='skills', on_delete=models.CASCADE)
     modifier = models.ForeignKey(Stat, related_name='stats', on_delete=models.CASCADE)
     referenceParagraph = models.IntegerField(default=0)
@@ -257,6 +261,7 @@ class Skill(models.Model):
 
 class Quest(models.Model):
     name = models.CharField(max_length=100)
+    chapter = models.ForeignKey(Chapter, related_name='chapter_quests', on_delete=models.CASCADE)
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='quests')
     referenceParagraph = models.IntegerField(default=1)
     referenceToLastRelevantEvent = models.IntegerField(default=0)
@@ -280,6 +285,7 @@ class Quest(models.Model):
 
 class Achievement(models.Model):
     name = models.CharField(max_length=100)
+    chapter = models.ForeignKey(Chapter, related_name='chapter_achievements', on_delete=models.CASCADE)
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='achievements')
     referenceParagraph = models.IntegerField(default=1)
     referenceToLastRelevantEvent = models.IntegerField(default=0)
@@ -324,6 +330,21 @@ class Item(models.Model):
 
     def __str__(self):
         return ''.join([str(self.id), ': ', self.name])
+
+class Currency(models.Model):
+    chapter = models.ForeignKey(Chapter, related_name='chapter_currencies', on_delete=models.CASCADE)
+    name = models.CharField(default="Coin", max_length=100)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='currencies')
+    referenceParagraph = models.IntegerField(default=1)
+    referenceToLastRelevantEvent = models.IntegerField(default=0)
+    amount = models.DecimalField(default=0.00, max_digits=20, decimal_places=2)
+
+    @property
+    def typeReference(self):
+        return 'currency'
+
+    def __str__(self):
+        return ''.join([str(self.id), ': ', str(self.name), ' of ', str(self.player)])
 
 # class Equipment(models.Model):
 #     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='players_equipment')
@@ -394,18 +415,3 @@ class Item(models.Model):
 
 #     def __str__(self):
 #         return ''.join([str(self.id), ': ', str(self.item)])
-
-class Currency(models.Model):
-    name = models.CharField(default="Coin", max_length=100)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='currencies')
-    referenceParagraph = models.IntegerField(default=1)
-    referenceToLastRelevantEvent = models.IntegerField(default=0)
-    amount = models.DecimalField(default=0.00, max_digits=20, decimal_places=2)
-
-    @property
-    def typeReference(self):
-        return 'currency'
-
-    def __str__(self):
-        return ''.join([str(self.id), ': ', str(self.name), ' of ', str(self.player)])
-

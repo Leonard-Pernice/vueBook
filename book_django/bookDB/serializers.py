@@ -6,6 +6,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = '__all__'
+        depth = 1
 
 
 class StatSerializer(serializers.ModelSerializer):
@@ -13,6 +14,7 @@ class StatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stat
         fields = '__all__'
+        depth = 1
 
         
 class SkillSerializer(serializers.ModelSerializer):
@@ -21,6 +23,7 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = '__all__'
+        depth = 1
 
 
 class QuestSerializer(serializers.ModelSerializer):
@@ -28,6 +31,7 @@ class QuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quest
         fields = '__all__'
+        depth = 1
 
 
 class AchievementSerializer(serializers.ModelSerializer):
@@ -35,6 +39,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = '__all__'
+        depth = 1
 
 
 class RelationshipSerializer(serializers.ModelSerializer):
@@ -42,6 +47,7 @@ class RelationshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Relationship
         fields = '__all__'
+        depth = 1
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -54,6 +60,7 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = '__all__'
+        depth = 1
 
     # def to_representation(self, instance):
     #     ret = super().to_representation(instance)
@@ -130,6 +137,7 @@ class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = '__all__'
+        depth = 1
 
 
 class CharacterSerializer(serializers.ModelSerializer):
@@ -139,12 +147,6 @@ class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         fields = '__all__'
-
-    # def to_representation(self, instance):
-    #     ret = super().to_representation(instance)
-    #     players = ret.pop('players')
-    #     ret.update({f"{player['referenceParagraph']}_{player['name']}": player for player in players})
-    #     return ret
 
 class ParagraphSerializer(serializers.ModelSerializer):
     class Meta:
@@ -159,6 +161,14 @@ class BookSerializer(serializers.ModelSerializer):
 class ChapterSerializer(serializers.ModelSerializer):
     paragraphs = ParagraphSerializer(many=True, read_only=True)
     characters = CharacterSerializer(many=True, read_only=True)
+    items = ItemSerializer(many=True, read_only=True)
+    chapter_players = PlayerSerializer(many=True, read_only=True)
+    chapter_relationships = RelationshipSerializer(many=True, read_only=True)
+    chapter_stats = StatSerializer(many=True, read_only=True)
+    chapter_skills = SkillSerializer(many=True, read_only=True)
+    chapter_quests = QuestSerializer(many=True, read_only=True)
+    chapter_achievements = AchievementSerializer(many=True, read_only=True)
+    chapter_currencies = CurrencySerializer(many=True, read_only=True)
     book = BookSerializer(read_only=True)
     class Meta:
         model = Chapter
@@ -201,37 +211,37 @@ class CreateCharacterSerializer(serializers.ModelSerializer):
 class CreatePlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['character', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'characterName', 'job', 'title', 'level', 'exp', 'typ']
+        fields = ['chapter', 'character', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'characterName', 'job', 'title', 'level', 'exp', 'typ']
 
 class CreateStatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stat
-        fields = ['player', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'base', 'increased', 'trained', 'bar']
+        fields = ['chapter', 'player', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'base', 'increased', 'trained', 'bar', 'idealValue']
 
 class CreateSkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
-        fields = ['player', 'modifier', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'level', 'exp', 'description', 'typ', 'ap', 'mp', 'st']
+        fields = ['chapter', 'player', 'modifier', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'level', 'exp', 'description', 'typ', 'ap', 'mp', 'st']
 
 class CreateQuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quest
-        fields = ['player', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'statusOfQuest', 'description', 'optional_description', 'tier', 'difficulty', 'reward_title', 'reward', 'optional_reward', 'exp_received']
+        fields = ['chapter', 'player', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'statusOfQuest', 'description', 'optional_description', 'tier', 'difficulty', 'reward_title', 'reward', 'optional_reward', 'exp_received']
 
 class CreateAchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
-        fields = ['player', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'description', 'tier', 'difficulty', 'reward']
+        fields = ['chapter', 'player', 'name', 'referenceParagraph', 'referenceToLastRelevantEvent', 'description', 'tier', 'difficulty', 'reward']
 
 class CreateRelationshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Relationship
-        fields = ['player', 'npc', 'referenceParagraph', 'referenceToLastRelevantEvent', 'score', 'description']
+        fields = ['chapter', 'player', 'npc', 'referenceParagraph', 'referenceToLastRelevantEvent', 'score', 'description']
 
 class CreateItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ['name', 'chapter', 'referenceParagraph', 'referenceToLastRelevantEvent', 'typ', 'slot', 'quantity', 'creator', 'rarity', 'appearance', 'details', 'attributes', 'charge', 'durability', 'belongsTo', 'isEquipped', 'inInventory', 'sellValue']
+        fields = ['chapter', 'name', 'chapter', 'referenceParagraph', 'referenceToLastRelevantEvent', 'typ', 'slot', 'quantity', 'creator', 'rarity', 'appearance', 'details', 'attributes', 'charge', 'durability', 'belongsTo', 'isEquipped', 'inInventory', 'sellValue']
 
 # class CreateEquipmentSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -251,4 +261,4 @@ class CreateItemSerializer(serializers.ModelSerializer):
 class CreateCurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['name', 'player', 'referenceParagraph', 'referenceToLastRelevantEvent', 'amount']
+        fields = ['chapter', 'name', 'player', 'referenceParagraph', 'referenceToLastRelevantEvent', 'amount']

@@ -75,6 +75,7 @@ def create_related_players(sender, instance, created, **kwargs):
             for group in queryset:
                 referencePlayer = Player.objects.get(id=group['highest_id'])
                 copyOfPlayer = Player(
+                    chapter=current_chapter_model,
                     name=referencePlayer.name,
                     character=instance,
                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
@@ -94,7 +95,7 @@ def create_related_players(sender, instance, created, **kwargs):
                 referenceItem = Item.objects.get(id=group['highest_id'])
                 copyOfItem = Item(
                     name=referenceItem.name,
-                    chapter=instance,
+                    chapter=current_chapter_model,
                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
                     typ=referenceItem.typ,
                     slot=referenceItem.slot,
@@ -117,7 +118,7 @@ def create_related_players(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Player)
 def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwargs):
     current_player = PlayerSerializer(instance).data
-    current_character = CharacterSerializer(Character.objects.get(id=current_player['character'])).data
+    current_character = CharacterSerializer(Character.objects.get(id=current_player['character']['id'])).data
     # current_paragraph = ParagraphSerializer(Paragraph.objects.get(id=current_character['paragraph'])).data
     current_chapter_model = Chapter.objects.get(id=current_character['chapter'])
     current_chapter = ChapterSerializer(current_chapter_model).data
@@ -135,6 +136,7 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
             for group in querysetStats:
                 referenceStat = Stat.objects.get(id=group['highest_id'])
                 copyOfStat = Stat(
+                    chapter=current_chapter_model,
                     name=referenceStat.name,
                     player=instance,
                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
@@ -149,6 +151,7 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
             for group in querysetQuests:
                 referenceQuest = Quest.objects.get(id=group['highest_id'])
                 copyOfQuest = Quest(
+                    chapter=current_chapter_model,
                     name=referenceQuest.name,
                     player=instance,
                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
@@ -168,6 +171,7 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
             for group in querysetAchievement:
                 referenceAchievement = Achievement.objects.get(id=group['highest_id'])
                 copyOfAchievement = Achievement(
+                    chapter=current_chapter_model,
                     name=referenceAchievement.name,
                     player=instance,
                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
@@ -187,6 +191,7 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
                     npcName = CharacterSerializer(Character.objects.get(id=int(str(referenceRelationship.npc).split(":")[0]))).data
                     relevantCharacter = Character.objects.get(name=npcName['name'], lastName=npcName['lastName'], chapter=current_chapter['id'])
                     copyOfRelationship = Relationship(
+                        chapter=current_chapter_model,
                         player=instance,
                         npc=relevantCharacter,
                         referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
@@ -275,6 +280,7 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
             for group in querysetCurrencies:
                 referenceCurrency = Currency.objects.get(id=group['highest_id'])
                 copyOfCurrency = Currency(
+                    chapter=current_chapter_model,
                     name=referenceCurrency.name,
                     player=instance,
                     referenceParagraph=int(ParagraphSerializer(Paragraph.objects.all().order_by('-id').first()).data['id']) + 1,
@@ -286,9 +292,9 @@ def create_related_StatsQuestsAchievementsETC(sender, instance, created, **kwarg
 @receiver(post_save, sender=Stat)
 def create_related_Skills(sender, instance, created, **kwargs):
     current_stat = StatSerializer(instance).data
-    current_player_model = Player.objects.get(id=current_stat['player'])
+    current_player_model = Player.objects.get(id=current_stat['player']['id'])
     current_player = PlayerSerializer(current_player_model).data
-    current_character = CharacterSerializer(Character.objects.get(id=current_player['character'])).data
+    current_character = CharacterSerializer(Character.objects.get(id=current_player['character']['id'])).data
     # current_paragraph = ParagraphSerializer(Paragraph.objects.get(id=current_character['paragraph'])).data
     current_chapter_model = Chapter.objects.get(id=current_character['chapter'])
     current_chapter = ChapterSerializer(current_chapter_model).data
@@ -311,6 +317,7 @@ def create_related_Skills(sender, instance, created, **kwargs):
                     statName = StatSerializer(Stat.objects.get(id=int(str(referenceSkill.modifier).split(":")[0]))).data
                     relevantStat = Stat.objects.get(name=statName['name'], player__character__chapter=current_chapter['id'])
                     copyOfSkill = Skill(
+                        chapter=current_chapter_model,
                         name=referenceSkill.name,
                         player=current_player_model,
                         modifier=relevantStat,

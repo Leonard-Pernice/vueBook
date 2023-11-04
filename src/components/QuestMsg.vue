@@ -48,7 +48,7 @@
 <script setup>
 import { useChapterStore } from '@/store/chapter'
 import GlowText from '@/components/GlowText.vue'
-import { findEvent, findPlayer, calcExp } from '@/help/extraFunctions.js'
+import { findEvent, calcExp } from '@/help/extraFunctions.js'
 
 const chapterStore = useChapterStore()
 
@@ -60,8 +60,9 @@ const props = defineProps({
 })
 
 const relevantQuest = findEvent(chapterStore.quests, props.p.id)
-const relevantPlayer = findPlayer(chapterStore.players, relevantQuest.player)
-relevantQuest['level'] = relevantPlayer.level
+// const relevantPlayer = findPlayer(chapterStore.players, relevantQuest.player)
+
+relevantQuest['level'] = relevantQuest.player.level
 relevantQuest['type'] = 'quest'
 relevantQuest['exp'] = calcExp(relevantQuest)
 relevantQuest['title'] = questTitle(relevantQuest)

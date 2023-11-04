@@ -27,7 +27,7 @@ onMounted(() => {
   getCurrentChapter()
 })
 
-
+// console.log(chapterStore)
 
 async function getCurrentChapter () {
   await axios
@@ -47,13 +47,15 @@ async function getCurrentChapter () {
         { data: {}, paragraphs: {} }
       )
       // const names = ['characters', 'players', 'stats', 'skills', 'relationships', 'achievements', 'quests', 'inventories', 'slots', 'equipments', 'items', 'currencies']
-      chapterStore.chapter = segregateStores(data)
+      chapterStore.chapter = copySurfaceData(data)
       // console.log(chapterStore.chapter)
+      segregateStores(data)
       chapterStore.paragraphs = paragraphs
       document.title = 'Book | ' + chapterStore.chapter.name
       chapterStore.currentChapter = chapterStore.chapter.name.replace(/[^0-9]/g, '')
       console.log('Current Chapter is: ', chapterStore.currentChapter)
       chapterStore.assumeInitialState()
+      // console.log(chapterStore)
     })
     .catch(error => {
       console.log(error)
@@ -113,6 +115,10 @@ function assumeEventState (event) {
   console.log('Processing: new event!', event.attributes)
   // console.log(event)
   for (const relevantEvent of event.relatedEvent) {
+    if (event.attributes === 'levelup') {
+      console.log(chapterStore.current.stats)
+      handleLevelUp(relevantEvent)
+    }
     switch (relevantEvent.typeReference) {
       case 'item':
         handleItem(relevantEvent)
@@ -121,6 +127,8 @@ function assumeEventState (event) {
         handleKill(relevantEvent)
         break
       case 'levelup':
+        console.log(relevantEvent)
+        
         break
       case 'quest':
         handleQuest(relevantEvent)
@@ -180,13 +188,13 @@ function handleKill (player) {
 function handleItem (item) {
   // Checking Inventory
   if (item.inInventory) {
-    if (!chapterStore.current.inventory.includes(item)) {
-      chapterStore.current.inventory.push(item)
+    if (!chapterStore.current.inventories.includes(item)) {
+      chapterStore.current.inventories.push(item)
       console.log('Updating inventory with item: ', item.name)
     }
   }
-  if (!item.inInventory && getNames(chapterStore.current.inventory).includes(item.name)) {
-    chapterStore.current.inventory = chapterStore.current.inventory.filter(remain => remain !== item)
+  if (!item.inInventory && getNames(chapterStore.current.inventories).includes(item.name)) {
+    chapterStore.current.inventories = chapterStore.current.inventories.filter(remain => remain !== item)
   }
   // Checking Equipment
   let slotCounts = {
@@ -206,7 +214,7 @@ function handleItem (item) {
     "Ranged": 0,
     "Earring": -1
   }
-  chapterStore.current.equipment.forEach(equip => {
+  chapterStore.current.equipments.forEach(equip => {
     const slot = equip.slot
     if (slot in slotCounts) {
       slotCounts[slot]++
@@ -214,44 +222,48 @@ function handleItem (item) {
   })
   console.log('Slot counts: ', slotCounts)
   if (item.isEquipped) {
-    if (!chapterStore.current.equipment.includes(item)) {
+    if (!chapterStore.current.equipments.includes(item)) {
       if (slotCounts[item.slot] <= 0) {
-        const itemIndex = chapterStore.current.equipment.findIndex(equip => equip.name === item.name)
+        const itemIndex = chapterStore.current.equipments.findIndex(equip => equip.name === item.name)
         if (itemIndex >= 0) {
-          chapterStore.current.equipment[itemIndex] = item
+          chapterStore.current.equipments[itemIndex] = item
           console.log('Updating equipment with item: ', item.name)
         } else {
-          chapterStore.current.equipment.push(item)
+          chapterStore.current.equipments.push(item)
           console.log('Updating equipment with item: ', item.name)
         }
       } else { throw new Error(`Too many items of slot "${item.slot}" already equipped. Cannot equip ${item}`)}
     }
   }
-  if (!item.isEquipped && getNames(chapterStore.current.equipment).includes(item.name)) {
-    chapterStore.current.equipment = chapterStore.current.equipment.filter(remain => remain !== item)
+  if (!item.isEquipped && getNames(chapterStore.current.equipments).includes(item.name)) {
+    chapterStore.current.equipments = chapterStore.current.equipments.filter(remain => remain !== item)
   }
 }
 
+function handleLevelUp (levelup) {
+  console.log(levelup)
+}
+
 function getNames(arr) {
-  let names = arr.map(obj => obj.name);
-  return names;
+  let names = arr.map(obj => obj.name)
+  return names
 }
 
-function getLowestNumberedParagraph(paragraphs) {
-    const keys = Object.keys(paragraphs);
-    let minNum = Infinity;
-    let minKey = "";
+// function getLowestNumberedParagraph(paragraphs) {
+//     const keys = Object.keys(paragraphs);
+//     let minNum = Infinity;
+//     let minKey = "";
 
-    keys.forEach(key => {
-        let num = parseInt(key.split("_")[0]);
-        if (num < minNum) {
-            minNum = num;
-            minKey = key;
-        }
-    });
+//     keys.forEach(key => {
+//         let num = parseInt(key.split("_")[0]);
+//         if (num < minNum) {
+//             minNum = num;
+//             minKey = key;
+//         }
+//     });
 
-    return minKey;
-}
+//     return minKey;
+// }
 
 function findClosestLower (dictionary, searchValue) {
   const array = Object.keys(dictionary).map(Number)
@@ -270,6 +282,23 @@ function findClosestLower (dictionary, searchValue) {
   }
 
   return dictionary[array[right]]
+}
+
+function copySurfaceData(inputObj) {
+    const outputObj = {};
+
+    for (const key in inputObj) {
+        const value = inputObj[key];
+
+        if (value !== null && typeof value === 'object') {
+            // We skip objects (including arrays)
+            continue;
+        }
+
+        outputObj[key] = value;
+    }
+
+    return outputObj;
 }
 
 function insertSurfaceData (obj, key) {
@@ -339,33 +368,33 @@ function segregateStores (obj) {
 
   // console.log(chapterStore.items)
 
-  const result = {}
+  // const result = {}
 
-  function recurse (cur, prop) {
-    if (Object(cur) !== cur) {
-      result[prop] = cur
-    } else if (Array.isArray(cur)) {
-      const l = cur.length
-      for (let i = 0; i < l; i++) {
-        recurse(cur[i], prop + '[' + i + ']')
-      }
-      if (l === 0) {
-        result[prop] = []
-      }
-    } else {
-      let isEmpty = true
-      for (const p in cur) {
-        isEmpty = false
-        recurse(cur[p], prop ? prop + '.' + p : p)
-      }
-      if (isEmpty && prop) {
-        result[prop] = {}
-      }
-    }
-  }
-  recurse(obj, '')
+  // function recurse (cur, prop) {
+  //   if (Object(cur) !== cur) {
+  //     result[prop] = cur
+  //   } else if (Array.isArray(cur)) {
+  //     const l = cur.length
+  //     for (let i = 0; i < l; i++) {
+  //       recurse(cur[i], prop + '[' + i + ']')
+  //     }
+  //     if (l === 0) {
+  //       result[prop] = []
+  //     }
+  //   } else {
+  //     let isEmpty = true
+  //     for (const p in cur) {
+  //       isEmpty = false
+  //       recurse(cur[p], prop ? prop + '.' + p : p)
+  //     }
+  //     if (isEmpty && prop) {
+  //       result[prop] = {}
+  //     }
+  //   }
+  // }
+  // recurse(obj, '')
 
-  return result
+  // return result
 }
 
 function showStat (stat) {

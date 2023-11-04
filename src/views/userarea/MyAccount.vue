@@ -280,7 +280,7 @@ async function createChapter () {
       axios
         .post('api/v1/chapters/', formData)
         .then(response => {
-          console.log('Chapter created. Now posting paragraphs...')
+          console.log('Chapter ', response.data.id,' created. Now posting paragraphs...')
           chapter.value = response.data.id
           logEntries()
         }).catch(error => { console.log(error) })
@@ -292,7 +292,7 @@ function createTextParagraph (formData, index) {
   axios
     .post('api/v1/create-paragraph/', formData)
     .then(response => {
-      console.log(`Posted entry ${response.data}. Now posting ${index + 1}`)
+      console.log(`Posted entry ${response.data.id}. Now posting ${index + 1}`)
       logEntries(index + 1)
     }).catch(error => { console.log(error) })
 }
@@ -326,12 +326,12 @@ function createKillEventParagraph (formData, index) {
     const expFromEvent = parseFloat(calcExp(options))
     const calculatedLevel = Math.floor(lastPlayerReference.level + parseFloat(lastPlayerReference.exp) + expFromEvent)
     const calculatedExp = parseFloat(lastPlayerReference.exp) + expFromEvent - Math.floor(parseFloat(lastPlayerReference.exp) + expFromEvent)
-    console.log(lastPlayerReference)
-    console.log('Reference level: ', lastPlayerReference.level)
-    console.log('Reference EXP: ', parseFloat(lastPlayerReference.exp))
-    console.log('Exp from event: ', expFromEvent)
-    console.log(`Calculated level: ${calculatedLevel}`)
-    console.log(`Calculated EXP: ${calculatedExp.toFixed(4)}`)
+    // console.log(lastPlayerReference)
+    // console.log('Reference level: ', lastPlayerReference.level)
+    // console.log('Reference EXP: ', parseFloat(lastPlayerReference.exp))
+    // console.log('Exp from event: ', expFromEvent)
+    // console.log(`Calculated level: ${calculatedLevel}`)
+    // console.log(`Calculated EXP: ${calculatedExp.toFixed(4)}`)
     const killEventFormData = {
       chapter: chapter.value,
       text: options.content,
@@ -345,7 +345,8 @@ function createKillEventParagraph (formData, index) {
       .then(response => {
         const killParagraph = response.data.id
         const playerFormData = {
-          character: lastPlayerReference.character,
+          chapter: chapter.value,
+          character: lastPlayerReference.character.id,
           name: playerName,
           referenceParagraph: killParagraph,
           referenceToLastRelevantEvent: lastPlayerReference.id,
@@ -362,8 +363,9 @@ function createKillEventParagraph (formData, index) {
           const newPlayer = response.data
           if (options.type === 'achievement') {
             const achievementFormData = {
+              chapter: chapter.value,
               player: newPlayer.id,
-              name: options.name,
+              name: options.achievement,
               referenceParagraph: killParagraph,
               referenceToLastRelevantEvent: lastPlayerReference.id, // This is an unnecessary field...
               description: options.description,
@@ -383,15 +385,16 @@ function createKillEventParagraph (formData, index) {
                 chapter: chapter.value,
                 paragraph: killParagraph,
                 playerName: lastPlayerReference.name,
-                questName: options.content
+                questName: options.quest
               }
             }).then(response => {
               const lastQuestReference = response.data
               const newStatus = 'Completed'
               console.log(lastQuestReference)
               const questFormData = {
+                chapter: chapter.value,
                 player: newPlayer.id,
-                name: options.content,
+                name: lastQuestReference.name,
                 referenceParagraph: killParagraph,
                 referenceToLastRelevantEvent: lastQuestReference.id,
                 statusOfQuest: newStatus,
@@ -423,17 +426,54 @@ function createKillEventParagraph (formData, index) {
             }).catch(error => { console.log(error) })
           }
           if (calculatedLevel > lastPlayerReference.level && lastPlayerReference.name === 'Kale') {
-            const levelUpFormData = {
-              chapter: chapter.value,
-              text: returnReward(calculatedLevel),
-              textorder: index + 0.25,
-              attributes: 'levelup',
-              exp: newPlayer.level
-            }
-            console.log('Posting a levelup event paragraph.')
-            axios.post('api/v1/create-eventparagraph/', levelUpFormData).then(response => {
-              console.log(`Posted levelup event ${response.data} at index: ${index + 0.25}. Now continuing with index: ${index + 1}`)
-              logEntries(index + 1)
+            // Updating all stats to their idealValue
+            console.log('Getting all stat objects...')
+            axios.get('api/v1/create-stat/', {
+              params: {
+                route: 'allStatsOfPlayer',
+                chapter: chapter.value,
+                paragraph: killParagraph,
+                playerName: playerName
+              }
+            }).then(response => {
+              const allStatsOfPlayer = response.data
+              const relevantStats = highestIdByName(allStatsOfPlayer)
+              for (const relevantStat of relevantStats) {
+                let idealValue
+                if (relevantStat.idealValue === 'min') {
+                  idealValue = 0 
+                } else {
+                  idealValue = relevantStat.base + relevantStat.increased + Math.floor(relevantStat.trained)
+                }
+                const levelupStatFormData = {
+                  chapter: chapter.value,
+                  player: newPlayer.id,
+                  name: relevantStat.name,
+                  referenceParagraph: killParagraph,
+                  referenceToLastRelevantEvent: relevantStat.id,
+                  base: relevantStat.base,
+                  increased: relevantStat.increased,
+                  trained: relevantStat.trained,
+                  bar: idealValue,
+                  idealValue: relevantStat.idealValue
+                }
+                console.log('Posting level up stat... ')
+                axios.post('api/v1/create-stat/', levelupStatFormData).then(response => {
+                  console.log('Posted new Stat from level up with ideal Stat value at ', response.data.idealValue)
+                }).catch(error => { console.log(error) })
+              }
+              const levelUpFormData = {
+                chapter: chapter.value,
+                text: returnReward(calculatedLevel),
+                textorder: index + 0.25,
+                attributes: 'levelup',
+                exp: newPlayer.level
+              }
+              console.log('Posting a levelup event paragraph.')
+              axios.post('api/v1/create-eventparagraph/', levelUpFormData).then(response => {
+                console.log(`Posted levelup event ${response.data} at index: ${index + 0.25}. Now continuing with index: ${index + 1}`)
+                logEntries(index + 1)
+              }).catch(error => { console.log(error) })
             }).catch(error => { console.log(error) })
           } else {
             console.log(`No levelup here. Now continuing with index: ${index + 1}`)
@@ -508,8 +548,9 @@ function createSkillUsedParagraph (formData, index) {
           console.log('Reference level is: ', lastSkillReference.level)
           console.log('Reference exp is: ', lastSkillReference.exp)
           const formDataSkill = {
+            chapter: chapter.value,
             player: lastPlayerReference.id,
-            modifier: lastSkillReference.modifier,
+            modifier: lastSkillReference.modifier.id,
             name: skillName,
             referenceParagraph: referenceParagraph,
             referenceToLastRelevantEvent: lastSkillReference.id,
@@ -531,7 +572,7 @@ function createSkillUsedParagraph (formData, index) {
               params: {
                 route: 'statByID',
                 chapter: chapter.value,
-                statid: postedSkill.modifier,
+                statid: postedSkill.modifier.id,
                 paragraph: referenceParagraph,
                 playerName: lastPlayerReference.name
               }
@@ -543,14 +584,16 @@ function createSkillUsedParagraph (formData, index) {
               const modifierExpFromSkillUsed = calcProgressExp(modifierStatLevel, findCost(options), lastReferenceOfStat) - parseInt(lastReferenceOfStat.base) - parseInt(lastReferenceOfStat.increased)
               console.log(`Updated ${lastReferenceOfStat.name} as modifier of ${skillName}.`)
               const formDataStat = {
-                player: postedSkill.player,
+                chapter: chapter.value,
+                player: postedSkill.player.id,
                 name: lastReferenceOfStat.name,
                 referenceParagraph: referenceParagraph,
                 referenceToLastRelevantEvent: lastReferenceOfStat.id,
                 base: lastReferenceOfStat.base,
                 increased: lastReferenceOfStat.increased,
                 trained: modifierExpFromSkillUsed.toFixed(2),
-                bar: lastReferenceOfStat.bar
+                bar: lastReferenceOfStat.bar,
+                idealValue: lastReferenceOfStat.idealValue
               }
               console.log(`Updating modifier of ${skillName}: ${lastReferenceOfStat.name}`)
               axios.post('api/v1/create-stat/', formDataStat).then(response => {
@@ -560,15 +603,22 @@ function createSkillUsedParagraph (formData, index) {
                 console.log('Cost is: ', findCost(options))
                 const costStatLevel = parseInt(statRelatedToCostOfSkill.base) + parseInt(statRelatedToCostOfSkill.increased) + parseFloat(statRelatedToCostOfSkill.trained)
                 const costStatExpFromSkillUsed = calcProgressExp(costStatLevel, findCost(options), statRelatedToCostOfSkill) - parseInt(statRelatedToCostOfSkill.base) - parseInt(statRelatedToCostOfSkill.increased)
+                const maxBar =statRelatedToCostOfSkill.base +statRelatedToCostOfSkill.increased + Math.floor(statRelatedToCostOfSkill.trained)
+                let newBarValue =statRelatedToCostOfSkill.bar + parseInt(findCost(options))
+                if (newBarValue > maxBar) {
+                  newBarValue = maxBar 
+                }
                 const costFormData = {
-                  player: postedSkill.player,
+                  chapter: chapter.value,
+                  player: postedSkill.player.id,
                   name: statRelatedToCostOfSkill.name,
                   referenceParagraph: referenceParagraph,
                   referenceToLastRelevantEvent: statRelatedToCostOfSkill.id,
                   base: statRelatedToCostOfSkill.base,
                   increased: statRelatedToCostOfSkill.increased,
                   trained: costStatExpFromSkillUsed.toFixed(2),
-                  bar: statRelatedToCostOfSkill.bar + parseInt(findCost(options))
+                  bar: newBarValue,
+                  idealValue: statRelatedToCostOfSkill.idealValue
                 }
                 console.log(costFormData)
                 console.log('previous trained: ', statRelatedToCostOfSkill.trained)
@@ -615,6 +665,7 @@ function createStatUpdateParagraph (formData, index) {
             return prev.id > current.id ? prev : current
           })
           const statFormData = {
+            chapter: chapter.value,
             player: lastRelevantStat.player,
             name: lastRelevantStat.name,
             referenceParagraph: referenceParagraph,
@@ -622,7 +673,8 @@ function createStatUpdateParagraph (formData, index) {
             base: lastRelevantStat.base,
             increased: lastRelevantStat.increased + Math.max(Number(options[statShorthand]) || 0, Number(options[stats[statShorthand]]) || 0),
             trained: lastRelevantStat.trained,
-            bar: lastRelevantStat.bar + Math.floor(Math.max(Number(options[statShorthand]) || 0, Number(options[stats[statShorthand]]) || 0))
+            bar: lastRelevantStat.bar + Math.floor(Math.max(Number(options[statShorthand]) || 0, Number(options[stats[statShorthand]]) || 0)),
+            idealValue: lastRelevantStat.idealValue
           }
           console.log(`Looping over relevant stats. Now trying to post ${lastRelevantStat.name}`)
           axios.post('api/v1/create-stat/', statFormData).then(response => {
@@ -718,7 +770,13 @@ function createDamageUpdateParagraph (formData, index) {
         console.log(latestPlayerInstance)
         const damagedStatLevel = parseInt(lastRelevantStat.base) + parseInt(lastRelevantStat.increased) + parseFloat(lastRelevantStat.trained)
         const damagedStatExp = calcProgressExp(damagedStatLevel, options.dmg, lastRelevantStat) - parseInt(lastRelevantStat.base) - parseInt(lastRelevantStat.increased)
+        const maxBar = lastRelevantStat.base + lastRelevantStat.increased + Math.floor(lastRelevantStat.trained)
+        let newBarValue = lastRelevantStat.bar + Math.floor(options.dmg)
+        if (newBarValue > maxBar) {
+          newBarValue = maxBar 
+        }
         const statFormData = {
+          chapter: chapter.value,
           player: latestPlayerInstance.id,
           name: lastRelevantStat.name,
           referenceParagraph: referenceParagraph,
@@ -726,7 +784,8 @@ function createDamageUpdateParagraph (formData, index) {
           base: lastRelevantStat.base,
           increased: lastRelevantStat.increased,
           trained: damagedStatExp.toFixed(2),
-          bar: lastRelevantStat.bar + Math.floor(options.dmg)
+          bar: newBarValue,
+          idealValue: lastRelevantStat.idealValue
         }
         console.log(`Updating ${relevantStat} to new bar value.`)
         console.log(statFormData)
@@ -804,7 +863,7 @@ function initializePlayer (formData, index) {
   axios.post('api/v1/create-eventparagraph/', formData).then(response => {
     console.log(`Posted Player Creation Reference Paragraph at Index: ${index + 0.60}.`)
     const referenceParagraph = response.data.id
-    console.log('Retrieving all Characters in the chapter appearing before this paragraph...')
+    console.log('Retrieving all Characters in the chapter (', chapter.value, ') appearing before this paragraph...')
     axios.get('api/v1/create-character/', { params: { chapter: chapter.value, paragraph: referenceParagraph } }).then(response => {
       const characterList = response.data
       let relevantCharacter
@@ -814,8 +873,9 @@ function initializePlayer (formData, index) {
         }
       }
       if (relevantCharacter) {
-        console.log('Creating the player instance: ', options.name)
+        console.log('Creating the player instance: ', options.name, ' in Chapter: ', chapter.value)
         const newPlayerFormData = {
+          chapter: chapter.value,
           character: relevantCharacter.id,
           name: options.name,
           referenceParagraph: referenceParagraph,
@@ -861,13 +921,15 @@ function initializeStat (formData, index) {
       const relevantPlayer = response.data
       console.log('Creating new Stat: ', options.name)
       const newStatFormData = {
+        chapter: chapter.value,
         player: relevantPlayer.id,
         name: options.name,
         referenceParagraph: referenceParagraph,
         base: options.base,
         increased: options.increased,
         trained: options.trained,
-        bar: options.bar
+        bar: options.bar,
+        idealValue: options.idealValue
       }
       axios.post('api/v1/create-stat/', newStatFormData).then(response => {
         const newStat = response.data
@@ -906,6 +968,7 @@ function initializeSkill (formData, index) {
         const relevantStat = response.data
         console.log('Creating new Skill: ', options.name)
         const newSkillFormData = {
+          chapter: chapter.value,
           player: relevantPlayer.id,
           modifier: relevantStat.id,
           name: options.name,
@@ -951,6 +1014,7 @@ function initializeQuest (formData, index) {
       const relevantPlayer = response.data
       console.log('Creating new Quest: ', options.name)
       const newQuestFormData = {
+        chapter: chapter.value,
         player: relevantPlayer.id,
         name: options.name,
         referenceParagraph: referenceParagraph,
@@ -1000,6 +1064,7 @@ function initializeRelationship (formData, index) {
         const relevantCharacter = response.data
         console.log(`Creating new Relationship of: ${options.player} with ${options.npc}`)
         const newRelationshipFormData = {
+          chapter: chapter.value,
           player: relevantPlayer.id,
           npc: relevantCharacter.id,
           referenceParagraph: referenceParagraph,
@@ -1381,6 +1446,24 @@ function findCost (options) {
   cost = Object.hasOwn(options, 'st') ? options.st : cost
   // console.log('Cost: ', cost)
   return parseInt(cost)
+}
+
+function highestIdByName(objects) {
+    const nameObjMap = {}
+
+    // Iterate over each object in the main object
+    for (const key in objects) {
+        const item = objects[key]
+        if (typeof item === 'object' && item !== null && 'name' in item && 'id' in item) {
+            // Check if we already have an entry for this name, and if not or this id is higher, update it
+            if (!(item.name in nameObjMap) || item.id > nameObjMap[item.name].id) {
+                nameObjMap[item.name] = item // Store the actual object
+            }
+        }
+    }
+
+    // Extract the values to a list
+    return Object.values(nameObjMap)
 }
 
 </script>

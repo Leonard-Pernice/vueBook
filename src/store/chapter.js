@@ -53,11 +53,11 @@ export const useChapterStore = defineStore('chapter', {
         if (counter > 10) {
           break
         }
-        console.log('waiting...')
+        console.log('Waiting...')
       }
       if (Object.keys(this.stats).length > 1) {
         this.dataLoaded = true;
-        console.log('done waiting...')
+        console.log('done waiting.')
       }
     },
     changeChapter (number) {

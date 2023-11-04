@@ -14,16 +14,16 @@ from .serializers import *
 
 class GetBookView(APIView):
     def get(self, request, book_id):
-        book = Book.objects.get(id=book_id)
+        book = Book.objects.get(id = book_id)
         serializer = BookSerializer(book)
         return Response(serializer.data)
 
 class ChapterTest(APIView):
     def get(self, request, pk):
         assert isinstance(pk, int)
-        chapter = ChapterSerializer(Chapter.objects.get(name=str('Chapter ' + str(pk)))).data
-        chapter_all = Chapter.objects.filter(id=chapter['id']).prefetch_related('paragraphs', 'characters', 'items').all()
-        chapter_out = ChapterSerializer(chapter_all, many=True).data
+        chapter = ChapterSerializer(Chapter.objects.get(name = str('Chapter ' + str(pk)))).data
+        chapter_all = Chapter.objects.filter(id = chapter['id']).prefetch_related('paragraphs', 'characters', 'items', 'chapter_players', 'chapter_relationships', 'chapter_stats', 'chapter_skills', 'chapter_quests', 'chapter_achievements', 'chapter_currencies').all()
+        chapter_out = ChapterSerializer(chapter_all, many = True).data
         return Response(chapter_out)
 
 class ChapterViewSet(viewsets.ModelViewSet):
@@ -34,51 +34,51 @@ class ChapterViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         book_id = request.data.get('book')
-        book = get_object_or_404(Book, id=book_id)
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        book = get_object_or_404(Book, id = book_id)
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
         serializer.validated_data['book'] = book
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # serializer = self.get_serializer(data=request.data)
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
+        # serializer = self.get_serializer(data = request.data)
         # if serializer.is_valid():
         #     self.perform_create(serializer)
-        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        #     return Response(serializer.data, status = status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data = request.data, partial = True)
         if serializer.is_valid():
             self.perform_update(serializer)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status = status.HTTP_204_NO_CONTENT)
 
 class GetChapterByNameView(APIView):
-    def get(self, request, format=None):
+    def get(self, request, format = None):
         name = request.query_params.get('name')
         try:
-            chapter = Chapter.objects.get(name=name)
+            chapter = Chapter.objects.get(name = name)
         except Chapter.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status = status.HTTP_404_NOT_FOUND)
         serializer = ChapterSerializer(chapter)
         return Response(serializer.data)
 
 class CreateChapterView(APIView):
     serializer_class = CreateChapterSerializer
 
-    def get(self, request, book_id, format=None):
-        chapters = Chapter.objects.filter(book=book_id)
-        serializer = ChapterSerializer(chapters, many=True)
+    def get(self, request, book_id, format = None):
+        chapters = Chapter.objects.filter(book = book_id)
+        serializer = ChapterSerializer(chapters, many = True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
             name = serializer.data.get('name')
             # image = serializer.data.get('image')
@@ -101,10 +101,10 @@ class CreateChapterView(APIView):
 class CreateParagraphView(APIView):
     serializer_class = CreateTextParagraphSerializer
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            chapter = Chapter.objects.get(id=serializer.data.get('chapter'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
             text = serializer.data.get('text')
             textorder = serializer.data.get('textorder')
             queryset = Paragraph.objects.filter(textorder = textorder, chapter = chapter)
@@ -123,15 +123,15 @@ class CreateParagraphView(APIView):
 class CreateEventParagraphView(APIView):
     serializer_class = CreateEventParagraphSerializer
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            chapter = Chapter.objects.get(id=serializer.data.get('chapter'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
             text = serializer.data.get('text')
             textorder = serializer.data.get('textorder')
             attributes = serializer.data.get('attributes')
             exp = serializer.data.get('exp')
-            queryset = Paragraph.objects.filter(textorder = textorder, chapter=chapter)
+            queryset = Paragraph.objects.filter(textorder = textorder, chapter = chapter)
             if queryset.exists():
                 paragraph = queryset[0]
                 paragraph.text = text
@@ -148,25 +148,25 @@ class CreateEventParagraphView(APIView):
 class CreateCharacterView(APIView):
     serializer_class = CreateCharacterSerializer
 
-    def get(self, request, format=None):
+    def get(self, request, format = None):
         chapterid = request.query_params.get('chapter')
         paragraphOfRelevantEvent = request.query_params.get('paragraph')
         name = request.query_params.get('name')
         lastname = request.query_params.get('lastname')
         if chapterid and paragraphOfRelevantEvent and name and lastname:
-            characters = Character.objects.filter(name = name, lastname = lastname, referenceParagraph__lt = paragraphOfRelevantEvent, chapter=chapterid)
-            serializer = CharacterSerializer(characters, many=True)
+            characters = Character.objects.filter(name = name, lastname = lastname, referenceParagraph__lt = paragraphOfRelevantEvent, chapter = chapterid)
+            serializer = CharacterSerializer(characters, many = True)
             return Response(serializer.data)
         elif chapterid and paragraphOfRelevantEvent:
             characters = Character.objects.filter(referenceParagraph__lt = paragraphOfRelevantEvent, chapter = chapterid)
-            serializer = CharacterSerializer(characters, many=True)
+            serializer = CharacterSerializer(characters, many = True)
             return Response(serializer.data)
         return Response(status = status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            chapter = Chapter.objects.get(id=serializer.data.get('chapter'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
             referenceParagraph = serializer.data.get('referenceParagraph')
             name = serializer.data.get('name')
             lastname = serializer.data.get('lastname')
@@ -194,11 +194,11 @@ class CreateCharacterView(APIView):
                 return Response(CharacterSerializer(character).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
-                    character = Character(chapter = chapter, referenceParagraph = referenceParagraph, name = name, lastname = lastname, referenceToLastRelevantEvent = referenceToLastRelevantEvent, information=information, statusOfNpc = statusOfNpc, age = age, gender = gender, height = height, weight = weight, species = species, race = race)
+                    character = Character(chapter = chapter, referenceParagraph = referenceParagraph, name = name, lastname = lastname, referenceToLastRelevantEvent = referenceToLastRelevantEvent, information = information, statusOfNpc = statusOfNpc, age = age, gender = gender, height = height, weight = weight, species = species, race = race)
                     character.save()
                     return Response(CharacterSerializer(character).data, status = status.HTTP_201_CREATED)
                 else:
-                    character = Character(chapter = chapter, referenceParagraph = referenceParagraph, name = name, lastname = lastname, information=information, statusOfNpc = statusOfNpc, age = age, gender = gender, height = height, weight = weight, species = species, race = race)
+                    character = Character(chapter = chapter, referenceParagraph = referenceParagraph, name = name, lastname = lastname, information = information, statusOfNpc = statusOfNpc, age = age, gender = gender, height = height, weight = weight, species = species, race = race)
                     character.save()
                     return Response(CharacterSerializer(character).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
@@ -206,7 +206,7 @@ class CreateCharacterView(APIView):
 class CreatePlayerView(APIView):
     serializer_class = CreatePlayerSerializer
 
-    def get(self, request, format=None):
+    def get(self, request, format = None):
       chapterid = request.query_params.get('chapter')
       name = request.query_params.get('name')
       index = request.query_params.get('index')
@@ -216,20 +216,22 @@ class CreatePlayerView(APIView):
       # print(index)
       # print(paragraphOfRelevantEvent)
       if chapterid and name and paragraphOfRelevantEvent:
-        player = Player.objects.filter(Q(name=name) & Q(referenceParagraph__lt=paragraphOfRelevantEvent) & Q(character__chapter=chapterid)).order_by('-id').first()
+        player = Player.objects.filter(Q(name = name) & Q(referenceParagraph__lt = paragraphOfRelevantEvent) & Q(character__chapter = chapterid)).order_by('-id').first()
         serializer = PlayerSerializer(player)
         return Response(serializer.data)
       if chapterid and name and index:
-        boundOfParagraphs = ParagraphSerializer(Paragraph.objects.filter(chapter = chapterid, textorder__lt=index).order_by('-textorder').first()).data
-        players = Player.objects.filter(name=name, referenceParagraph__lt=float(boundOfParagraphs['id']), character__chapter=chapterid)
-        serializer = PlayerSerializer(players, many=True)
+        boundOfParagraphs = ParagraphSerializer(Paragraph.objects.filter(chapter = chapterid, textorder__lt = index).order_by('-textorder').first()).data
+        players = Player.objects.filter(name = name, referenceParagraph__lt = float(boundOfParagraphs['id']), character__chapter = chapterid)
+        serializer = PlayerSerializer(players, many = True)
         return Response(serializer.data)
       return Response(status = status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            character = Character.objects.get(id=serializer.data.get('character'))
+            print(serializer.data.get('chapter'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
+            character = Character.objects.get(id = serializer.data.get('character'))
             name = serializer.data.get('name')
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
@@ -251,11 +253,11 @@ class CreatePlayerView(APIView):
                 return Response(PlayerSerializer(player).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
-                    player = Player(character = character, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, characterName = characterName, job = job, title = title, level = level, exp = exp, typ = typ)
+                    player = Player(chapter = chapter, character = character, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, characterName = characterName, job = job, title = title, level = level, exp = exp, typ = typ)
                     player.save()
                     return Response(PlayerSerializer(player).data, status = status.HTTP_201_CREATED)
                 else:
-                    player = Player(character = character, name = name, referenceParagraph = referenceParagraph, characterName = characterName, job = job, title = title, level = level, exp = exp, typ = typ)
+                    player = Player(chapter = chapter, character = character, name = name, referenceParagraph = referenceParagraph, characterName = characterName, job = job, title = title, level = level, exp = exp, typ = typ)
                     player.save()
                     return Response(PlayerSerializer(player).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
@@ -263,7 +265,7 @@ class CreatePlayerView(APIView):
 class CreateStatView(APIView):
     serializer_class = CreateStatSerializer
 
-    def get(self, request, format=None):
+    def get(self, request, format = None):
       route = request.query_params.get('route')
       chapterid = request.query_params.get('chapter')
       statid = request.query_params.get('statid')
@@ -271,29 +273,30 @@ class CreateStatView(APIView):
       playerName = request.query_params.get('playerName')
       paragraphOfRelevantEvent = request.query_params.get('paragraph')
       if chapterid and paragraphOfRelevantEvent and route and Stat.objects.filter(player__character__chapter = chapterid):
-        if route == 'statByID' and statid and playerName: # All instances of a specific stat via ID
+        if route  ==  'statByID' and statid and playerName: # All instances of a specific stat via ID
           stat = Stat.objects.filter(id = statid).first()
           if stat:
             relevantStatObjects = Stat.objects.filter(player__name = playerName, referenceParagraph__lt = paragraphOfRelevantEvent, player__character__chapter = chapterid, name = stat.name)
-            serializer = StatSerializer(relevantStatObjects, many=True)
+            serializer = StatSerializer(relevantStatObjects, many = True)
             return Response(serializer.data)
-        elif route == 'statByName' and statName and playerName: # All instances of a specific stat via Name
+        elif route  ==  'statByName' and statName and playerName: # All instances of a specific stat via Name
           stat = Stat.objects.filter(name = statName, referenceParagraph__lt = paragraphOfRelevantEvent, player__character__chapter = chapterid).order_by('-id').first()
           serializer = StatSerializer(stat)
           return Response(serializer.data)
-        elif route == 'allStatsOfPlayer' and playerName: # All stats of player in chapter previous to event
+        elif route  ==  'allStatsOfPlayer' and playerName: # All stats of player in chapter previous to event
           chapter = get_object_or_404(Chapter, id = chapterid)
           stats = Stat.objects.filter(player__name = playerName, player__referenceParagraph__lt = paragraphOfRelevantEvent, player__character__chapter = chapter)
-          serializer = StatSerializer(stats, many=True)
+          serializer = StatSerializer(stats, many = True)
           return Response(serializer.data)
       else:
         return Response("No stats available.")
-      return Response(status=status.HTTP_400_BAD_REQUEST)
+      return Response(status = status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            player = Player.objects.get(id=serializer.data.get('player'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
+            player = Player.objects.get(id = serializer.data.get('player'))
             name = serializer.data.get('name')
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
@@ -301,6 +304,7 @@ class CreateStatView(APIView):
             increased = serializer.data.get('increased')
             trained = serializer.data.get('trained')
             bar = serializer.data.get('bar')
+            idealValue = serializer.data.get('idealValue')
             # Sanity Checking the Bar:
             theoretic_total = math.floor(float(base) + float(increased) + float(trained))
             if float(bar) > theoretic_total:
@@ -316,11 +320,11 @@ class CreateStatView(APIView):
                 return Response(StatSerializer(stat).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
-                    stat = Stat(player = player, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, base = base, increased = increased, trained = trained, bar = bar)
+                    stat = Stat(chapter = chapter, player = player, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, base = base, increased = increased, trained = trained, bar = bar, idealValue = idealValue)
                     stat.save()
                     return Response(StatSerializer(stat).data, status = status.HTTP_201_CREATED)
                 else:
-                    stat = Stat(player = player, name = name, referenceParagraph = referenceParagraph, base = base, increased = increased, trained = trained, bar = bar)
+                    stat = Stat(chapter = chapter, player = player, name = name, referenceParagraph = referenceParagraph, base = base, increased = increased, trained = trained, bar = bar, idealValue = idealValue)
                     stat.save()
                     return Response(StatSerializer(stat).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
@@ -328,19 +332,20 @@ class CreateStatView(APIView):
 class CreateSkillView(APIView):
     serializer_class = CreateSkillSerializer
 
-    def get(self, request, format=None):
+    def get(self, request, format = None):
       chapterid = request.query_params.get('chapter')
       playerName = request.query_params.get('playerName')
       skillName = request.query_params.get('skillName')
-      skill = Skill.objects.filter(Q(name=skillName) & Q(player__name=playerName) & Q(player__character__chapter = chapterid))
-      serializer = SkillSerializer(skill, many=True)
+      skill = Skill.objects.filter(Q(name = skillName) & Q(player__name = playerName) & Q(player__character__chapter = chapterid))
+      serializer = SkillSerializer(skill, many = True)
       return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            player = Player.objects.get(id=serializer.data.get('player'))
-            modifier = Stat.objects.get(id=serializer.data.get('modifier'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
+            player = Player.objects.get(id = serializer.data.get('player'))
+            modifier = Stat.objects.get(id = serializer.data.get('modifier'))
             name = serializer.data.get('name')
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
@@ -365,11 +370,11 @@ class CreateSkillView(APIView):
                 return Response(SkillSerializer(skill).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
-                    skill = Skill(player = player, modifier = modifier, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, level = level, exp = exp, description = description, typ = typ, ap = ap, mp = mp, st = st)
+                    skill = Skill(chapter = chapter, player = player, modifier = modifier, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, level = level, exp = exp, description = description, typ = typ, ap = ap, mp = mp, st = st)
                     skill.save()
                     return Response(SkillSerializer(skill).data, status = status.HTTP_201_CREATED)
                 else:
-                    skill = Skill(player = player, modifier = modifier, name = name, referenceParagraph = referenceParagraph, level = level, exp = exp, description = description, typ = typ, ap = ap, mp = mp, st = st)
+                    skill = Skill(chapter = chapter, player = player, modifier = modifier, name = name, referenceParagraph = referenceParagraph, level = level, exp = exp, description = description, typ = typ, ap = ap, mp = mp, st = st)
                     skill.save()
                     return Response(SkillSerializer(skill).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
@@ -377,7 +382,7 @@ class CreateSkillView(APIView):
 class CreateQuestView(APIView):
     serializer_class = CreateQuestSerializer
 
-    def get(self, request, format=None):
+    def get(self, request, format = None):
       chapterid = request.query_params.get('chapter')
       playerName = request.query_params.get('playerName')
       questName = request.query_params.get('questName')
@@ -386,10 +391,11 @@ class CreateQuestView(APIView):
       serializer = QuestSerializer(quest)
       return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            player = Player.objects.get(id=serializer.data.get('player'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
+            player = Player.objects.get(id = serializer.data.get('player'))
             name = serializer.data.get('name')
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
@@ -409,15 +415,15 @@ class CreateQuestView(APIView):
                 quest.description = description
                 quest.tier = tier
                 quest.difficulty = difficulty
-                quest.save(update_fields=['statusOfQuest', 'description', 'tier', 'difficulty'])
+                quest.save(update_fields = ['statusOfQuest', 'description', 'tier', 'difficulty'])
                 return Response(QuestSerializer(quest).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
-                    quest = Quest(player = player, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, statusOfQuest = statusOfQuest, description = description, optional_description = optional_description, tier = tier, difficulty = difficulty, reward_title = reward_title, reward = reward, optional_reward = optional_reward, exp_received = exp_received)
+                    quest = Quest(chapter = chapter, player = player, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, statusOfQuest = statusOfQuest, description = description, optional_description = optional_description, tier = tier, difficulty = difficulty, reward_title = reward_title, reward = reward, optional_reward = optional_reward, exp_received = exp_received)
                     quest.save()
                     return Response(QuestSerializer(quest).data, status = status.HTTP_201_CREATED)
                 else:
-                    quest = Quest(player = player, name = name, referenceParagraph = referenceParagraph, statusOfQuest = statusOfQuest, description = description, optional_description = optional_description, tier = tier, difficulty = difficulty, reward_title = reward_title, reward = reward, optional_reward = optional_reward, exp_received = exp_received)
+                    quest = Quest(chapter = chapter, player = player, name = name, referenceParagraph = referenceParagraph, statusOfQuest = statusOfQuest, description = description, optional_description = optional_description, tier = tier, difficulty = difficulty, reward_title = reward_title, reward = reward, optional_reward = optional_reward, exp_received = exp_received)
                     quest.save()
                     return Response(QuestSerializer(quest).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
@@ -425,10 +431,11 @@ class CreateQuestView(APIView):
 class CreateAchievementView(APIView):
     serializer_class = CreateAchievementSerializer
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
-            player = Player.objects.get(id=serializer.data.get('player'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
+            player = Player.objects.get(id = serializer.data.get('player'))
             name = serializer.data.get('name')
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
@@ -443,10 +450,10 @@ class CreateAchievementView(APIView):
                 achievement.tier = tier
                 achievement.difficulty = difficulty
                 achievement.reward = reward
-                achievement.save(update_fields=['description', 'tier', 'difficulty', 'reward'])
+                achievement.save(update_fields = ['description', 'tier', 'difficulty', 'reward'])
                 return Response(AchievementSerializer(achievement).data, status = status.HTTP_200_OK)
             else:
-                achievement = Achievement(player = player, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, description = description, tier = tier, difficulty = difficulty, reward = reward)
+                achievement = Achievement(chapter = chapter, player = player, name = name, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, description = description, tier = tier, difficulty = difficulty, reward = reward)
                 achievement.save()
                 return Response(AchievementSerializer(achievement).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
@@ -454,7 +461,7 @@ class CreateAchievementView(APIView):
 class CreateItemView(APIView):
     serializer_class = CreateItemSerializer
 
-    def get(self, request, format=None): 
+    def get(self, request, format = None): 
       chapterid = request.query_params.get('chapter')
       itemName = request.query_params.get('itemName')
       referenceParagraph = request.query_params.get('paragraph')
@@ -462,11 +469,11 @@ class CreateItemView(APIView):
       serializer = ItemSerializer(item)
       return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
             name = serializer.data.get('name')
-            chapter = Chapter.objects.get(id=serializer.data.get('chapter'))
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
             typ = serializer.data.get('typ')
@@ -481,7 +488,7 @@ class CreateItemView(APIView):
             durability = serializer.data.get('durability')
             print("character id is:", serializer.data.get('belongsTo'))
             print(serializer.data)
-            belongsTo = Character.objects.get(id=serializer.data.get('belongsTo'))
+            belongsTo = Character.objects.get(id = serializer.data.get('belongsTo'))
             isEquipped = serializer.data.get('isEquipped')
             inInventory = serializer.data.get('inInventory')
             sellValue = serializer.data.get('sellValue')
@@ -493,7 +500,7 @@ class CreateItemView(APIView):
                 item.quantity = quantity
                 item.rarity = rarity
                 item.appearance = appearance
-                item.save(update_fields=['typ', 'slot', 'quantity', 'rarity', 'appearance'])
+                item.save(update_fields = ['typ', 'slot', 'quantity', 'rarity', 'appearance'])
                 return Response(ItemSerializer(item).data, status = status.HTTP_200_OK)
             else:
                 if referenceToLastRelevantEvent:
@@ -509,10 +516,10 @@ class CreateItemView(APIView):
 # class CreateEquipmentView(APIView):
 #     serializer_class = CreateEquipmentSerializer
 
-#     def post(self, request, format=None):
-#         serializer = self.serializer_class(data=request.data)
+#     def post(self, request, format = None):
+#         serializer = self.serializer_class(data = request.data)
 #         if serializer.is_valid():
-#             player = Player.objects.get(id=serializer.data.get('player'))
+#             player = Player.objects.get(id = serializer.data.get('player'))
 #             referenceParagraph = serializer.data.get('referenceParagraph')
 #             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
 #             head = serializer.data.get('head')
@@ -570,7 +577,7 @@ class CreateItemView(APIView):
 #                 equipment.ring10 = ring10
 #                 equipment.earring1 = earring1
 #                 equipment.earring2 = earring2
-#                 equipment.save(update_fields=['head', 'neck', 'shoulders', 'back', 'chest', 'wrist', 'waist', 'underpants', 'legs', 'feet', 'main_hand', 'off_hand', 'ranged', 'trinket', 'ring1', 'ring2', 'ring3', 'ring4', 'ring5', 'ring6', 'ring7', 'ring8', 'ring9', 'ring10', 'earring1', 'earring2'])
+#                 equipment.save(update_fields = ['head', 'neck', 'shoulders', 'back', 'chest', 'wrist', 'waist', 'underpants', 'legs', 'feet', 'main_hand', 'off_hand', 'ranged', 'trinket', 'ring1', 'ring2', 'ring3', 'ring4', 'ring5', 'ring6', 'ring7', 'ring8', 'ring9', 'ring10', 'earring1', 'earring2'])
 #                 return Response(EquipmentSerializer(equipment).data, status = status.HTTP_200_OK)
 #             else:
 #                 equipment = Item(player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, head = head, neck = neck, shoulders = shoulders, back = back, chest = chest, wrist = wrist, waist = waist, underpants = underpants, legs = legs, feet = feet, main_hand = main_hand, off_hand = off_hand, ranged = ranged, trinket = trinket, ring1 = ring1, ring2 = ring2, ring3 = ring3, ring4 = ring4, ring5 = ring5, ring6 = ring6, ring7 = ring7, ring8 = ring8, ring9 = ring9, ring10 = ring10, earring1 = earring1, earring2 = earring2)
@@ -581,19 +588,19 @@ class CreateItemView(APIView):
 # class CreateInventoryView(APIView):
 #     serializer_class = CreateInventorySerializer
 
-#     def get(self, request, format=None):
+#     def get(self, request, format = None):
 #         player = request.query_params.get('player')
 #         chapterid = request.query_params.get('chapter')
 #         paragraph = request.query_params.get('paragraph')
 #         if player and chapterid and paragraph:
-#             inventory = Inventory.objects.filter(player__name=player, player__character__chapter=chapterid, referenceParagraph__lt=paragraph).order_by('-id').first()
-#             return Response(InventorySerializer(inventory).data, status=status.HTTP_200_OK)
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
+#             inventory = Inventory.objects.filter(player__name = player, player__character__chapter = chapterid, referenceParagraph__lt = paragraph).order_by('-id').first()
+#             return Response(InventorySerializer(inventory).data, status = status.HTTP_200_OK)
+#         return Response(status = status.HTTP_400_BAD_REQUEST)
 
-#     def post(self, request, format=None):
-#         serializer = self.serializer_class(data=request.data)
+#     def post(self, request, format = None):
+#         serializer = self.serializer_class(data = request.data)
 #         if serializer.is_valid():
-#             player = Player.objects.get(id=serializer.data.get('player'))
+#             player = Player.objects.get(id = serializer.data.get('player'))
 #             referenceParagraph = serializer.data.get('referenceParagraph')
 #             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
 #             slots = serializer.data.get('slots')
@@ -601,7 +608,7 @@ class CreateItemView(APIView):
 #             if queryset.exists():
 #                 inventory = queryset[0]
 #                 inventory.slots = slots
-#                 inventory.save(update_fields=['slots'])
+#                 inventory.save(update_fields = ['slots'])
 #                 return Response(InventorySerializer(inventory).data, status = status.HTTP_200_OK)
 #             else:
 #                 inventory = Inventory(player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, slots = slots)
@@ -612,18 +619,18 @@ class CreateItemView(APIView):
 # class CreateSlotView(APIView):
 #     serializer_class = CreateSlotSerializer
 
-#     def post(self, request, format=None):
-#         serializer = self.serializer_class(data=request.data)
+#     def post(self, request, format = None):
+#         serializer = self.serializer_class(data = request.data)
 #         if serializer.is_valid():
-#             inventory = Inventory.objects.get(id=serializer.data.get('inventory'))
-#             item = Item.objects.get(id=serializer.data.get('item'))
+#             inventory = Inventory.objects.get(id = serializer.data.get('inventory'))
+#             item = Item.objects.get(id = serializer.data.get('item'))
 #             referenceParagraph = serializer.data.get('referenceParagraph')
 #             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
 #             queryset = Slot.objects.filter(Q(inventory = inventory) & Q(referenceParagraph = referenceParagraph))
 #             if queryset.exists():
 #                 slot = queryset[0]
 #                 slot.item = item
-#                 slot.save(update_fields=['item'])
+#                 slot.save(update_fields = ['item'])
 #                 return Response(SlotSerializer(slot).data, status = status.HTTP_200_OK)
 #             else:
 #                 slot = Slot(inventory = inventory, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, item = item)
@@ -634,11 +641,12 @@ class CreateItemView(APIView):
 class CreateCurrencyView(APIView):
     serializer_class = CreateCurrencySerializer
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format = None):
+        serializer = self.serializer_class(data = request.data)
         if serializer.is_valid():
+            chapter = Chapter.objects.get(id = serializer.data.get('chapter'))
             name = serializer.data.get('name')
-            player = Player.objects.get(id=serializer.data.get('player'))
+            player = Player.objects.get(id = serializer.data.get('player'))
             referenceParagraph = serializer.data.get('referenceParagraph')
             referenceToLastRelevantEvent = serializer.data.get('referenceToLastRelevantEvent')
             amount = serializer.data.get('amount')
@@ -646,10 +654,10 @@ class CreateCurrencyView(APIView):
             if queryset.exists():
                 currency = queryset[0]
                 currency.amount = amount
-                currency.save(update_fields=['amount'])
+                currency.save(update_fields = ['amount'])
                 return Response(CurrencySerializer(currency).data, status = status.HTTP_200_OK)
             else:
-                currency = Currency(name = name, player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, amount = amount)
+                currency = Currency(chapter = chapter, name = name, player = player, referenceParagraph = referenceParagraph, referenceToLastRelevantEvent = referenceToLastRelevantEvent, amount = amount)
                 currency.save()
                 return Response(CurrencySerializer(currency).data, status = status.HTTP_201_CREATED)
         return Response({'Bad Request': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)

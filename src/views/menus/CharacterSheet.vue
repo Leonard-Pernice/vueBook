@@ -106,9 +106,10 @@ import statMulti from '@/help/statMulti.json'
 const chapterStore = useChapterStore()
 const statMultipliers = statMulti
 
+console.log(chapterStore)
 
 function combineNameTitle (player) {
-  if (player.title.includes('the')) {
+  if ((''+player.title).includes('the')) {
     return player.name + player.title
   } else if (player.title === '-') {
     return player.name
@@ -151,7 +152,7 @@ function getColor (stat) {
 
 function getStatMaximum (stat, player, character) {
   const totalStatPoints = calcAccumulatedStatPoints(player.level)
-  const genderMulti = statMultipliers[character.species][character.gender][baseMult]
+  const genderMulti = statMultipliers[character.species][character.gender]["baseMult"]
   const statMulti = statMultipliers[character.species][character.gender][invertedStatAbreviations[stat.name]]
   const maxval = ((totalStatPoints/2 * genderMulti * statMulti).toFixed(0)) + stat.base
   return maxval
@@ -169,7 +170,7 @@ function returnTileColor (stat, player, character, tile) {
 function getRemainingStatPoints (player, stats) {
   const totalStatPoints = calcAccumulatedStatPoints(player.level)
   let spentStatPoints = 0
-  for (stat in stats) {
+  for (const stat in stats) {
     spentStatPoints += stat.increased
   }
   return totalStatPoints - spentStatPoints
@@ -183,8 +184,6 @@ function getRemainingStatPoints (player, stats) {
 //   stat5: ['Mom', 3, '-', 2, 3, 'green'],
 //   stat6: ['Cha', 2, '-', 2, 3, 'pink']
 // }
-
-const statPoints = 0
 
 const invertedStatAbreviations = {}
 

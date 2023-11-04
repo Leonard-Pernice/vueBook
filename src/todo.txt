@@ -1,12 +1,22 @@
 System
-  o change power to difficulty in the json chapters to match the new exp calculation
-  o changed options.content to correctly refer to the name of the achievment. change for quest and others as well and adapt in jsons
-  o keep convention of designating specific characters at ALL events, even if Kale is default
+  x change power to difficulty in the json chapters to match the new exp calculation
+  x changed options.content to correctly refer to the name of the achievment. change for quest and others as well and adapt in jsons
+  x keep convention of designating specific characters at ALL events, even if Kale is default
   o ?? create functions for all change events to be reused everywhere
     o statChange => player, stat, changeValue (bar/inc/train); calcExp at negatives, recover at positives, warn at results below zero, default at max value for reset
     o skillUse => player, skill, statChange; calcExp for skill
     o expChange => player, source; calcExp, sendLvlUp (statChange to reset statBars)
     o 
+  o create event for choosing a skill (line 402 Chapter 1)
+  o how can I manage bold/italics through the database retrieval? special attributes? What about inline bold etc? difficult... Example: Chapter 2 line 190
+  o deal with flat exp gain: chapter 2 line 373, 419
+  o deal with observing a monster event: chapter 2 line 563, 810
+  o loot chapter 2 line 1218, 1245, 2131
+  x achievement chapter 2 line 1264
+  o create character Nalya: chapter 2 line 1386, Martin Paysan 1600
+  o new quest chapter 2 1430
+  o hunger: chapter 2 1679
+  o spending stats: 2317
   x create button to upload chapter in json format
     x adapt the function to account for kill syntax and other events:
       o introduce character/player
@@ -42,6 +52,8 @@ System
   o create loading icon for signaling when page is still loading
     o scrolling animation to last pos when loading is done
   o hide scrollbar in mobile view
+  o change message screen gradient background to fade out at the borders instead of a hard cut
+  o create a hover tooltip for the stat bars
   o (maybe not) change all the views to components => keepalive + dynamic components via :is=""
   o get the chapter selection navigation bar working
   o create buttons for prev and next chapter

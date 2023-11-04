@@ -61,20 +61,39 @@ export function calcExp (msg) {
 // }
 
 export function calcStatPointsOnLevel(lvl) {
+  // console.log('THERE')
   const statpoints = Math.round(lvl + Math.pow(Math.floor(lvl / 10), Math.log(lvl * 2)))
-  return statpoints;
+  return statpoints
 }
 
-export function calcAccumulatedStatPoints(lvl) {
-  const level = Math.floor(lvl)
-  let total = 0;
-  if (level == 1) {
-      return 1;
-  } else if(level == 0) {
-      return 0;
-  } else {
-      total += calcStatPointsOnLevel(level) + calcAccumulatedStatPoints(level - 1)
-      return total;
+// export function calcAccumulatedStatPoints(lvl) {
+//   const level = Math.floor(lvl)
+//   let total = 0
+//   // console.log('HERE')
+//   if (level === 1) {
+//       return 1
+//   } else if(level === 0) {
+//       return 0
+//   } else {
+//       total += calcStatPointsOnLevel(level) + calcAccumulatedStatPoints(level - 1)
+//       console.log('Total so far: ', total)
+//       return total
+//   }
+// }
+
+export function calcAccumulatedStatPoints (lvl) {
+  // console.log(lvl)
+  let level = Math.floor(lvl)
+  let total = 0
+  while (level > 1) {
+    total += calcStatPointsOnLevel(level)
+    level -= 1
+  }
+  if (level === 1) {
+    return total + 1
+  }
+  if (level === 0) {
+    return total
   }
 }
 
