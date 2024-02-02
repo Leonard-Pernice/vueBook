@@ -76,11 +76,13 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-  scrollBehavior () {
-    return { x: 0, y: 0 }
-  }
+  routes
 })
+
+// ,
+//   scrollBehavior () {
+//     return { x: 0, y: 0 }
+//   }
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireLogin) && !accountStore.isAuthenticated) {

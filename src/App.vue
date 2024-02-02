@@ -1,7 +1,6 @@
 <template>
   <nav>
     <div class="flex flex-row pt-2 pb-1 top-0 w-full fixed bg-black justify-center space-x-4" v-show="navigationStore.showTopNav">
-      <!-- <div class="iconContainer"><router-link to="/">Home</router-link></div> -->
       <router-link to="/">
         <div class="iconContainer hover:bg-green-700" v-if="navigationStore.showBackButton" @click="navigationStore.hideBackButton(); changeButtonColor('back')">
           <svg
@@ -38,7 +37,6 @@
           </svg>
         </div>
       </router-link>
-      <!-- <div class="iconContainer">test: {{ navigationStore.count }} is {{ navigationStore.oddOrEven }}</div> -->
       <router-link to="/skills">
         <div class="iconContainer hover:bg-green-700" v-if="show.showSkills" @click="navigationStore.toggleBackButton(); changeButtonColor('skill')">
           <svg
@@ -131,7 +129,7 @@
       </router-link>
 
       <div class="">
-        <button class="fixed hover:bg-blue-700 top-2 left-2 outline-1 py-2 px-4" @click="showNav()">
+        <button name="CHAPTERNAVIGATION" class="fixed hover:bg-blue-700 top-2 left-2 outline-1 py-2 px-4" @click="showNav()">
           <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_429_11066)">
               <path d="M3 6.00092H21M3 12.0009H21M3 18.0009H21" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -144,7 +142,7 @@
           </svg>
         </button>
       </div>
-      <button class="fixed top-2 right-2 hover:bg-blue-700 py-2 px-4 mr-1" @click="navigationStore.toggleBackButton(); accountPage()">
+      <button name="ACCOUNT" class="fixed top-2 right-2 hover:bg-blue-700 py-2 px-4 mr-1" @click="navigationStore.toggleBackButton(); accountPage()">
         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0_429_11066)">
             <g id="icons"><g id="user"><ellipse cx="12" cy="8" rx="5" ry="6"/><path d="M21.8,19.1c-0.9-1.8-2.6-3.3-4.8-4.2c-0.6-0.2-1.3-0.2-1.8,0.1c-1,0.6-2,0.9-3.2,0.9s-2.2-0.3-3.2-0.9    C8.3,14.8,7.6,14.7,7,15c-2.2,0.9-3.9,2.4-4.8,4.2C1.5,20.5,2.6,22,4.1,22h15.8C21.4,22,22.5,20.5,21.8,19.1z"/></g></g>
@@ -157,14 +155,12 @@
         </svg>
       </button>
       </div>
-    <!-- <router-link to="leftNav">Test</router-link> |
-    <router-link to="rightNav">Test</router-link> -->
 
   </nav>
   <router-view />
 
   <SidebarLeft v-if=navigationStore.showChapterNav />
-  <StatBars />
+  <StatBars v-if="navigationStore.showResBars"/>
 </template>
 
 <script setup>

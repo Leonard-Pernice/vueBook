@@ -66,21 +66,6 @@ export function calcStatPointsOnLevel(lvl) {
   return statpoints
 }
 
-// export function calcAccumulatedStatPoints(lvl) {
-//   const level = Math.floor(lvl)
-//   let total = 0
-//   // console.log('HERE')
-//   if (level === 1) {
-//       return 1
-//   } else if(level === 0) {
-//       return 0
-//   } else {
-//       total += calcStatPointsOnLevel(level) + calcAccumulatedStatPoints(level - 1)
-//       console.log('Total so far: ', total)
-//       return total
-//   }
-// }
-
 export function calcAccumulatedStatPoints (lvl) {
   // console.log(lvl)
   let level = Math.floor(lvl)

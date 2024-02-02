@@ -1,68 +1,45 @@
 <template>
-  <div class="mt-20 mx-4 flex flex-col items-center justify-center">
-    <img class="max-w-[90%] h-auto my-4" src="@/assets/img/chapterheads/chapter1.jpg" alt="Cityview">
-    <!-- <figure class="align-center border-2 border-white">
-      <img :src="chapter.get_image">
-    </figure> -->
-    <h1 class="text-white text-2xl">Chapter {{ chapterStore.currentChapter }}</h1>
-    <div v-for="(textObj, i) in chapterStore.paragraphs" :key="i" :id="textObj.id"><TextInjector :p="textObj"></TextInjector></div>
-  </div>
+  <div v-if="errMsg"> {{ errMsg }} </div>
+  <KeepAlive>
+    <Suspense>
+      <ChapterContent />
+      <template #fallback>
+        <LoadingScreen />
+      </template>
+    </Suspense>
+  </KeepAlive>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onErrorCaptured, watchEffect } from 'vue'
 import { useNavigationStore } from '@/store/index'
 import { useChapterStore } from '@/store/chapter'
 import { useEventListener } from '@vueuse/core'
-import TextInjector from '@/components/TextInjector.vue'
-import axios from 'axios'
+import LoadingScreen from '@/components/LoadingScreen.vue'
+import ChapterContent from '@/views/ChapterContent.vue'
 
 const navigationStore = useNavigationStore()
 const chapterStore = useChapterStore()
 const pastEvents = []
 const futureEvents = []
 
-onMounted(() => {
-  navigationStore.showTopNav = true
-  getCurrentChapter()
+const errMsg = ref(null)
+
+onErrorCaptured(() => {
+  errMsg.value = 'Error loading chapter'
+  console.log(errMsg.value)
 })
 
-// console.log(chapterStore)
-
-async function getCurrentChapter () {
-  await axios
-    .get('/api/v1/chapter/1/') // + chapterStore.currentChapter.chapterNumber + '/'
-    .then(response => {
-      const entries = response.data[0]
-      const numericKey = /^\d+$/
-      const { data, paragraphs } = Object.keys(entries).reduce(
-        (acc, key) => {
-          if (numericKey.test(key)) {
-            acc.paragraphs[key] = entries[key]
-          } else {
-            acc.data[key] = entries[key]
-          }
-          return acc
-        },
-        { data: {}, paragraphs: {} }
-      )
-      // const names = ['characters', 'players', 'stats', 'skills', 'relationships', 'achievements', 'quests', 'inventories', 'slots', 'equipments', 'items', 'currencies']
-      chapterStore.chapter = copySurfaceData(data)
-      // console.log(chapterStore.chapter)
-      segregateStores(data)
-      chapterStore.paragraphs = paragraphs
-      document.title = 'Book | ' + chapterStore.chapter.name
-      chapterStore.currentChapter = chapterStore.chapter.name.replace(/[^0-9]/g, '')
-      console.log('Current Chapter is: ', chapterStore.currentChapter)
-      chapterStore.assumeInitialState()
-      // console.log(chapterStore)
-    })
-    .catch(error => {
-      console.log(error)
-    })
-}
+const closestParagraphId = ref(null)
+watchEffect(() => {
+  localStorage.setItem('closestParagraphId', closestParagraphId.value)
+})
 
 useEventListener(document, 'scroll', () => {
+  if (chapterStore.dataLoaded === true) {
+    findClosestParagraph()
+    console.log('Closest Paragraph: ', closestParagraphId.value)
+  }
   const currentScrollPosition = window.scrollY || document.documentElement.scrollTop
   if (currentScrollPosition < 0) {
     return
@@ -79,7 +56,7 @@ useEventListener(document, 'scroll', () => {
   if (futureEvents.length === 0 && pastEvents.length === 0) {
     futureEvents.push(...Object.values(chapterStore.eventParagraphs))
   }
-  const latestParagraph = chapterStore.paragraphs[findClosestLower(navigationStore.paragraphHeights, navigationStore.lastScrollPosition)]
+  const latestParagraph = chapterStore.paragraphs[findClosestLower(navigationStore.eventParagraphHeights, navigationStore.lastScrollPosition)]
   if (latestParagraph) {
     const indexFutureEvent = futureEvents.findIndex(item => item.id === latestParagraph.id)
     if (indexFutureEvent >= 0) {
@@ -92,6 +69,7 @@ useEventListener(document, 'scroll', () => {
     
     const indexPastEvent = pastEvents.findIndex(item => item.id === latestParagraph.id)
     if (indexPastEvent >= 0 && indexPastEvent < pastEvents.length - 1) {
+      console.log('Resetting')
       chapterStore.assumeInitialState()
       const deProcessedEvents = pastEvents.splice(indexPastEvent + 1, pastEvents.length)
       futureEvents.unshift(...deProcessedEvents)
@@ -106,6 +84,7 @@ useEventListener(document, 'scroll', () => {
     //     -> then I only have to change the pointer, not all the values inside
 
   } else if (latestParagraph === undefined && pastEvents.length > 0) {
+    console.log('Resetting')
     chapterStore.assumeInitialState()
     futureEvents.unshift(pastEvents.pop())
   }
@@ -292,7 +271,7 @@ function copySurfaceData(inputObj) {
 
         if (value !== null && typeof value === 'object') {
             // We skip objects (including arrays)
-            continue;
+            continue
         }
 
         outputObj[key] = value;
@@ -304,12 +283,14 @@ function copySurfaceData(inputObj) {
 function insertSurfaceData (obj, key) {
   const newObj = {}
   const inners = obj[key]
+  // console.log(inners)
   if (inners) {
     for (const [, inner_value] of Object.entries(inners)) {
       const newKey = `${inner_value.referenceParagraph}_${inner_value.name}`
       newObj[newKey] = inner_value
     }
   }
+  // console.log(newObj)
   return newObj
 }
 
@@ -327,11 +308,15 @@ function insertDeepData (obj, key) {
   return newObj
 }
 
-function segregateStores (obj) {
 
+
+function segregateStores (obj) {
+  // console.log(obj)
   // Characters
   chapterStore.characters = {}
+  // console.log(chapterStore.characters)
   chapterStore.characters = insertSurfaceData(obj, 'characters')
+  // console.log(chapterStore.characters)
   // Players
   chapterStore.players = {}
   chapterStore.players = insertDeepData(obj['characters'], 'players')
@@ -409,5 +394,44 @@ function showStat (stat) {
 function calcTotal (stat) {
   return Math.floor(stat.base + stat.increased + Math.floor(parseFloat(stat.trained)))
 }
+
+const findClosestParagraph = () => {
+  const scrollPosition = window.scrollY;
+  const paragraphHeights = navigationStore.paragraphHeights;
+
+  let closestDistance = Infinity;
+  let closestId = null;
+
+  const heightEntries = Object.entries(paragraphHeights);
+  const numEntries = heightEntries.length;
+
+  let left = 0;
+  let right = numEntries - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const [height, paragraphId] = heightEntries[mid];
+
+    const heightValue = parseInt(height);
+    const distance = Math.abs(scrollPosition - heightValue);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestId = paragraphId;
+    }
+
+    if (heightValue === scrollPosition) {
+      // Exact match found, no need to continue searching
+      break;
+    } else if (heightValue < scrollPosition) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  closestParagraphId.value = closestId;
+};
+
 
 </script>

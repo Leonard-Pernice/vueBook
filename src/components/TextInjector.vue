@@ -14,7 +14,7 @@
         <div v-if="props.p.attributes === 'item'"><ItemMsg :p="props.p"></ItemMsg></div>
       </div>
     </div>
-  </template>
+</template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
@@ -42,12 +42,16 @@ onMounted(() => {
   if (props.p.attributes != '') {
     // const pElements = container.value.querySelectorAll('div')
     const p = document.getElementById(props.p.id)
+    // console.log('ID:', props.p.id)
     const height = parseInt(Math.floor(p.offsetTop) - window.innerHeight / 2)
-    navigationStore.paragraphHeights[height] = props.p.id
+    navigationStore.eventParagraphHeights[height] = props.p.id
     chapterStore.eventParagraphs[props.p.id] = props.p
     chapterStore.eventParagraphs[props.p.id]['relatedEvent'] = searchEvent(props.p.id)
     // console.log(chapterStore.paragraphs[props.p.id])
   }
+  const pH = document.getElementById(props.p.id)
+  const pHeight = parseInt(Math.floor(pH.offsetTop) - window.innerHeight / 2)
+  navigationStore.paragraphHeights[pHeight] = props.p.id
 })
 
 function searchEvent (reference) {

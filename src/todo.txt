@@ -1,4 +1,6 @@
 System
+  x move all data loading into the chapterStore
+  o ensure that refreshing the page does not empty the store (to avoid the page breaking when the character sheet or others are refreshed)
   x change power to difficulty in the json chapters to match the new exp calculation
   x changed options.content to correctly refer to the name of the achievment. change for quest and others as well and adapt in jsons
   x keep convention of designating specific characters at ALL events, even if Kale is default
@@ -7,6 +9,7 @@ System
     o skillUse => player, skill, statChange; calcExp for skill
     o expChange => player, source; calcExp, sendLvlUp (statChange to reset statBars)
     o 
+  o make sure the token for authentication is saved in cookie not in localStorage
   o create event for choosing a skill (line 402 Chapter 1)
   o how can I manage bold/italics through the database retrieval? special attributes? What about inline bold etc? difficult... Example: Chapter 2 line 190
   o deal with flat exp gain: chapter 2 line 373, 419

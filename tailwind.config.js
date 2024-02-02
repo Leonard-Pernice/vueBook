@@ -10,13 +10,13 @@ module.exports = {
     extend: {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'lying-s': 'url(./img/icons/topbar1.svg)',
-        'lying-knife': 'url(./img/icons/topbar2.svg)',
-        'lying-sun': 'url(./img/icons/topbar3.svg)',
-        'big-swirl': 'url(./img/icons/narrowtop1.svg)',
-        'lying-cross': 'url(./img/icons/narrowtop2.svg)',
-        'lying-x': 'url(./img/icons/top1.svg)',
-        'lying-y': 'url(./img/icons/top2.svg)'
+        'lying-s': 'url(./src/assets/img/icons/topbar1.svg)',
+        'lying-knife': 'url(./src/assets/img/icons/topbar2.svg)',
+        'lying-sun': 'url(./src/assets/img/icons/topbar3.svg)',
+        'big-swirl': 'url(./src/assets/img/icons/narrowtop1.svg)',
+        'lying-cross': 'url(./src/assets/img/icons/narrowtop2.svg)',
+        'lying-x': 'url(./src/assets/img/icons/top1.svg)',
+        'lying-y': 'url(./src/assets/img/icons/top2.svg)'
       },
       colors: {
         'gr-inner-blue': '#000A1C',
@@ -35,7 +35,7 @@ module.exports = {
           'scrollbar-width': 'none'
         },
         '.border-image-source': {
-          'border-image-source': 'url(./img/icons/golden_border.png)'
+          'border-image-source': 'url(./src/assets/img/icons/golden_border.png)'
         },
         '.border-image-slice': {
           'border-image-slice': '128'
