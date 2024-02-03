@@ -209,10 +209,6 @@ onBeforeMount(() => {
   accountStore.checkToken()
 })
 
-onMounted(async () => {
-  await chapterStore.fetchData()
-})
-
 function accountPage () {
   router.push(accountStore.isAuthenticated ? '/account' : '/login')
 }

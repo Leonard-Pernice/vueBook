@@ -5,12 +5,13 @@
         <img :src="chapter.get_image">
       </figure> -->
       <h1 class="text-white text-2xl">Chapter {{ chapterStore.currentChapter }}</h1>
+      <button @click="scrollTo(navigationStore.savedScrollPosition)">Scroll to location X</button>
       <div v-for="(textObj, i) in chapterStore.paragraphs" :key="i" :id="textObj.id"><TextInjector :p="textObj"></TextInjector></div>
     </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onActivated, onMounted } from 'vue'
 import { useChapterStore } from '@/store/chapter'
 import { useNavigationStore } from '@/store/index'
 import TextInjector from '@/components/TextInjector.vue'
@@ -44,16 +45,10 @@ async function getCurrentChapter (chapterNumber) {
             paragraph.scrollIntoView()
           }
         }
-        // Get the number of items in localStorage
-        const localStorageItemCount = localStorage.length;
-
-        // Loop through each item in localStorage
-        for (let i = 0; i < localStorageItemCount; i++) {
-          const key = localStorage.key(i);
-          const value = localStorage.getItem(key);
-
-          // Log or process the key-value pair as needed
-          console.log(`Key: ${key}, Value: ${value}`);
+        if (localStorage.getItem('dataLoaded')) {
+          if (localStorage.getItem('savedScrollPosition') > 0) {
+            scrollTo()
+          }
         }
 
       })
@@ -61,6 +56,27 @@ async function getCurrentChapter (chapterNumber) {
         console.log(error)
       })
   }
+}
+
+onActivated(() => {
+  if (localStorage.getItem('dataLoaded')) {
+    if(localStorage.getItem('savedScrollPosition') > 0) {
+      scrollTo()
+    }
+  }
+})
+
+function scrollTo () {
+  const paragraph = localStorage.getItem('savedScrollPosition')
+  const element = document.getElementById(paragraph)
+  const rect = element.getBoundingClientRect()
+  console.log('Trying to scroll to paragraph:', paragraph)
+  window.scrollTo({
+    left: rect.left + window.scrollX, 
+    top: rect.top + window.scrollY, 
+    behavior: 'instant'
+  })
+  navigationStore.hideTopNav()
 }
 
 </script>

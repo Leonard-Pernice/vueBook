@@ -62,6 +62,8 @@ export const useChapterStore = defineStore('chapter', {
         console.error(error)
       } finally {
         this.loading = false
+        this.dataLoaded = true
+        localStorage.setItem('dataLoaded', this.dataLoaded)
       }
     },
     copySurfaceData (data) {
@@ -139,21 +141,6 @@ export const useChapterStore = defineStore('chapter', {
       }
       return newObj
     },
-    async fetchData() {
-      let counter = 0
-      while (this.stats.length <= 1) {
-        await new Promise((resolve) => setTimeout(resolve, 100))
-        counter += 1
-        if (counter > 10) {
-          break
-        }
-        console.log('Waiting...')
-      }
-      if (Object.keys(this.stats).length > 1) {
-        this.dataLoaded = true;
-        console.log('done waiting.')
-      }
-    },
     changeChapter (number) {
       this.currentChapter = number
     },
@@ -171,7 +158,6 @@ export const useChapterStore = defineStore('chapter', {
     },
     async assumeInitialState () {
       // Wait until data is loaded
-      this.fetchData()
       while (!this.dataLoaded) {
         await new Promise(resolve => setTimeout(resolve, 100))
       }

@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, onErrorCaptured, watchEffect } from 'vue'
+import { ref, onErrorCaptured, watchEffect, onMounted } from 'vue'
 import { useNavigationStore } from '@/store/index'
 import { useChapterStore } from '@/store/chapter'
 import { useEventListener } from '@vueuse/core'
@@ -24,21 +24,53 @@ const pastEvents = []
 const futureEvents = []
 
 const errMsg = ref(null)
+const scrolling = ref(false)
 
 onErrorCaptured(() => {
   errMsg.value = 'Error loading chapter'
   console.log(errMsg.value)
 })
 
-const closestParagraphId = ref(null)
+onMounted(async () => {
+  console.log(localStorage.getItem('savedScrollPosition'))
+  if (localStorage.getItem('savedScrollPosition') > 0) {
+    scrolling.value = true
+    try {
+      console.log('Chapter still loading...')
+      await waitForChapter(checkLoadStatus)
+      console.log('Now scrolling...')
+      scrollTo()
+    } catch (error) {
+      console.log(error)
+    }
+    scrolling.value = false
+  }
+})
+
+async function waitForChapter(checkLoadStatus) {
+  while (checkLoadStatus()) {
+    await delay (100)
+  }
+}
+
+const checkLoadStatus = () => {
+  return chapterStore.dataLoaded
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 watchEffect(() => {
-  localStorage.setItem('closestParagraphId', closestParagraphId.value)
+  console.log(navigationStore.savedScrollPosition)
+  localStorage.setItem('savedScrollPosition', navigationStore.savedScrollPosition)
 })
 
 useEventListener(document, 'scroll', () => {
-  if (chapterStore.dataLoaded === true) {
+  if (chapterStore.dataLoaded === true && !scrolling.value) {
     findClosestParagraph()
-    console.log('Closest Paragraph: ', closestParagraphId.value)
+    console.log('Closest Paragraph: ', navigationStore.savedScrollPosition)
+    console.log('In Local Storage: ', localStorage.getItem('savedScrollPosition'))
   }
   const currentScrollPosition = window.scrollY || document.documentElement.scrollTop
   if (currentScrollPosition < 0) {
@@ -228,6 +260,20 @@ function getNames(arr) {
   return names
 }
 
+
+function scrollTo () {
+  const paragraph = localStorage.getItem('savedScrollPosition')
+  const element = document.getElementById(paragraph)
+  const rect = element.getBoundingClientRect()
+  console.log('Trying to scroll to paragraph:', paragraph)
+  window.scrollTo({
+    left: rect.left + window.scrollX, 
+    top: rect.top + window.scrollY, 
+    behavior: 'smooth'
+  })
+  navigationStore.hideTopNav()
+}
+
 // function getLowestNumberedParagraph(paragraphs) {
 //     const keys = Object.keys(paragraphs);
 //     let minNum = Infinity;
@@ -396,42 +442,42 @@ function calcTotal (stat) {
 }
 
 const findClosestParagraph = () => {
-  const scrollPosition = window.scrollY;
-  const paragraphHeights = navigationStore.paragraphHeights;
+  const scrollPosition = window.scrollY - window.outerHeight - 78
+  const paragraphHeights = navigationStore.paragraphHeights
 
-  let closestDistance = Infinity;
-  let closestId = null;
+  let closestDistance = Infinity
+  let closestId = null
 
-  const heightEntries = Object.entries(paragraphHeights);
-  const numEntries = heightEntries.length;
+  const heightEntries = Object.entries(paragraphHeights)
+  const numEntries = heightEntries.length
 
-  let left = 0;
-  let right = numEntries - 1;
+  let left = 0
+  let right = numEntries - 1
 
   while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-    const [height, paragraphId] = heightEntries[mid];
+    const mid = Math.floor((left + right) / 2)
+    const [height, paragraphId] = heightEntries[mid]
 
-    const heightValue = parseInt(height);
-    const distance = Math.abs(scrollPosition - heightValue);
+    const heightValue = parseInt(height)
+    const distance = Math.abs(scrollPosition - heightValue)
 
     if (distance < closestDistance) {
-      closestDistance = distance;
-      closestId = paragraphId;
+      closestDistance = distance
+      closestId = paragraphId
     }
 
     if (heightValue === scrollPosition) {
       // Exact match found, no need to continue searching
-      break;
+      break
     } else if (heightValue < scrollPosition) {
-      left = mid + 1;
+      left = mid + 1
     } else {
-      right = mid - 1;
+      right = mid - 1
     }
   }
 
-  closestParagraphId.value = closestId;
-};
+  navigationStore.savedScrollPosition = closestId
+}
 
 
 </script>

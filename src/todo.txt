@@ -1,6 +1,7 @@
 System
   x move all data loading into the chapterStore
-  o ensure that refreshing the page does not empty the store (to avoid the page breaking when the character sheet or others are refreshed)
+  x ensure that refreshing the page does not empty the store (to avoid the page breaking when the character sheet or others are refreshed)
+  o think about adding a little popup when a user opens a chapter after some time "continue where you left off?"-like. 
   x change power to difficulty in the json chapters to match the new exp calculation
   x changed options.content to correctly refer to the name of the achievment. change for quest and others as well and adapt in jsons
   x keep convention of designating specific characters at ALL events, even if Kale is default
@@ -29,7 +30,7 @@ System
       o initialize monster?
       o initialize paragon
       o initialize pact
-  o create session info to load last state when user logs in and such
+  o create cookies info to load last state when user logs in and such
     o create function inside the respective view to post this chapter to django
   x create django models and serializers for all the character variables, quests, npcs, etc.
     o stats
@@ -47,13 +48,13 @@ System
       o create vue templates and components that list these for easy overview and implement buttons to dynamically call changes
         o components should include input fields for all the relevant information (e.g. character: name, age, gender, etc.)
   o create django view to export a list of all chapters to link them to the navigation menu via v-for
-  o create functions in loaded() method or whatever it is to jump back to last position after switch
+  x create functions in loaded() method or whatever it is to jump back to last position after switch
   o EVENT LOADING
     x whenever an event is scrolled past, the function just goes through all the end points in the chapter JSON and loads the ones closest to the respective referenceToLastRelevantEvent
-    o the topnav should be hidden after a dynamic distance value dependent on the users screen size, not a flat value
+    (o) the topnav should be hidden after a dynamic distance value dependent on the users screen size, not a flat value
   o think about mobile implementations?
-  o create loading icon for signaling when page is still loading
-    o scrolling animation to last pos when loading is done
+  x create loading icon for signaling when page is still loading
+    o scrolling animation to last pos when loading is done (localStorage doesnt persist after refresh for some reason)
   o hide scrollbar in mobile view
   o change message screen gradient background to fade out at the borders instead of a hard cut
   o create a hover tooltip for the stat bars

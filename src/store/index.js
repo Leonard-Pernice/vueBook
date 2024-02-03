@@ -5,6 +5,7 @@ export const useNavigationStore = defineStore('nav', {
     activePage: '',
     chapterNumber: 1,
     lastScrollPosition: 0,
+    savedScrollPosition: 0,
     eventParagraphHeights: {},
     paragraphHeights: {},
     showTopNav: true,
@@ -45,6 +46,7 @@ export const useNavigationStore = defineStore('nav', {
     hideBackButton () {
       this.showBackButton = false
       this.showResBars = true
+      this.hideTopNav()
     },
     toggleBackButton () {
       this.showBackButton = true

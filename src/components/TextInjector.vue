@@ -1,6 +1,6 @@
 <template>
     <div ref="container">
-      <div :id="props.p.id">
+      <div :id="props.p.id" class="text-white"><!-- {{ props.p.id }} -->
         <p v-if="props.p.attributes === ''" class="text-justify py-1 px-4 text-sm indent-3 leading-6 text-yellow-50">{{ props.p.text }}</p>
         <p v-if="props.p.attributes === 'apUsed'"></p>
         <p v-if="props.p.attributes === 'mpUsed'"></p>
