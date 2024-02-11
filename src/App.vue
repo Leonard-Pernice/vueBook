@@ -164,7 +164,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted } from 'vue'
+import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 
 import SidebarLeft from '@/components/SidebarLeft.vue'
@@ -173,12 +173,10 @@ import StatBars from '@/components/StatBars.vue'
 
 import { useNavigationStore } from '@/store/index'
 import { useAccountStore } from '@/store/account'
-import { useChapterStore } from './store/chapter'
 // import axios from 'axios'
 
 const router = useRouter()
 
-const chapterStore = useChapterStore()
 const navigationStore = useNavigationStore()
 const accountStore = useAccountStore()
 
@@ -230,10 +228,13 @@ function showNav () {
 </script>
 
 <style>
+
+
 body {
   background-color: black;
   margin-left: 2%;
   margin-right: 2%;
   margin-top: 8%;
 }
+
 </style>

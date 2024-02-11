@@ -1,4 +1,14 @@
 System
+  o Creation Page:
+    o Create all the fields and stuff for the things that are outlined in text
+    o Submission button: 
+      o Create a function that converts the text from the submission page into json format
+      o Create functions in django that handle all chapter processing server-side and then respond with a "Done" message (this requires some sort of persistance in case people edit chapters after submission)
+        o Create loads of signals according to the structure I created for uploading my chapters in the account page
+        o MIRO --> create specific workflows for every possible event and translate them into models, signals, views, serializers, etc. 
+      o Create a function that regularly saves the current content of the text editor 
+      o (Create offline message in case of lost internet connection)
+      o (Create offline editing capabilities with automatic merging into the existing save so people can continue to write while offline)
   x move all data loading into the chapterStore
   x ensure that refreshing the page does not empty the store (to avoid the page breaking when the character sheet or others are refreshed)
   o think about adding a little popup when a user opens a chapter after some time "continue where you left off?"-like. 
@@ -9,7 +19,7 @@ System
     o statChange => player, stat, changeValue (bar/inc/train); calcExp at negatives, recover at positives, warn at results below zero, default at max value for reset
     o skillUse => player, skill, statChange; calcExp for skill
     o expChange => player, source; calcExp, sendLvlUp (statChange to reset statBars)
-    o 
+    o ...
   o make sure the token for authentication is saved in cookie not in localStorage
   o create event for choosing a skill (line 402 Chapter 1)
   o how can I manage bold/italics through the database retrieval? special attributes? What about inline bold etc? difficult... Example: Chapter 2 line 190
@@ -35,7 +45,7 @@ System
   x create django models and serializers for all the character variables, quests, npcs, etc.
     o stats
       o implement stat maximum percentile <-- this can be an auto field or @property in the backend, since no manual input is needed
-      o create models for "human", "elf", male, female, etc.
+      o create static models for "human", "elf", male, female, etc.
     o paragon stuff
     o pact stuff
     o etc.

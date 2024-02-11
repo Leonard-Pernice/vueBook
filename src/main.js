@@ -2,6 +2,9 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 // import pinia from './store/store.js'
 import axios from 'axios'
+import license from '@/assets/license.json'
+import { registerLicense } from '@syncfusion/ej2-base'
+registerLicense(license.licenses.syncfusion)
 
 import App from './App.vue'
 import router from './router'

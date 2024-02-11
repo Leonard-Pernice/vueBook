@@ -17,7 +17,8 @@ export const useNavigationStore = defineStore('nav', {
       'Momentum': false,
       'Charisma': false,
       'Spirit': false
-    }
+    },
+    storyDropDown: {}
   }),
   actions: {
     showStat (stat) {
@@ -51,6 +52,12 @@ export const useNavigationStore = defineStore('nav', {
     toggleBackButton () {
       this.showBackButton = true
       this.showResBars = false
+    },
+    hideResBars() {
+      this.showResBars = false
+    },
+    toggleResBars() {
+      this.showResBars = true
     },
     hpTrue () { this.bars[0].show = true },
     hpFalse () { this.bars[0].show = false },

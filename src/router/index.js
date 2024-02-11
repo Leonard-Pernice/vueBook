@@ -68,6 +68,14 @@ const routes = [
     }
   },
   {
+    path: '/account/create-chapter',
+    name: 'Create Chapter',
+    component: () => import('../views/userarea/TextEditor.vue'),
+    meta: {
+      requireLogin: true
+    }
+  },
+  {
     path: '/graphs',
     name: 'graphs',
     component: () => import('../views/userarea/GraphModelling.vue')

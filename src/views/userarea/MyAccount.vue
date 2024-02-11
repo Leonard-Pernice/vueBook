@@ -13,7 +13,16 @@
         <div class="border border-white w-96 h-24 p-2">
           <!-- <input type="number" id="chapterNumber" value="0"> -->
           <input type="file" id="jsonChapterFile" @change="loadJson()" />
-          <button @click="createChapter()" class="bg-green-400 hover:bg-green-500 text-white py-2 px-4 rounded-md w-full">Log Entries</button>
+          <button @click="importChapter()" class="bg-green-400 hover:bg-green-500 text-white py-2 px-4 rounded-md w-full">Log Entries</button>
+        </div>
+      </div>
+      <div class="flex justify-center items-center my-10">
+        <div class="w-96 h-24 p-2">
+          <RouterLink to="/account/create-chapter">
+            <button class="h-12 p-2 text-white bg-green-400 rounded-md w-full">
+              Create a new Chapter
+            </button>
+          </RouterLink>
         </div>
       </div>
       <div class="flex justify-center items-center my-10">
@@ -31,10 +40,10 @@ import { useChapterStore } from '@/store/chapter'
 import { useAccountStore } from '@/store/account'
 import axios from 'axios'
 import { useRouter, useRoute } from 'vue-router'
-import { ref } from 'vue'
-// import  CircleProgressBar from 'vue3-m-circle-progress-bar'
-// import 'vue3-m-circle-progress-bar/style.css'
+import { ref, onBeforeMount } from 'vue'
+import { useNavigationStore } from '@/store'
 
+const navigationStore = useNavigationStore()
 const chapterStore = useChapterStore()
 const accountStore = useAccountStore()
 
@@ -74,6 +83,10 @@ const stats = ref({
   // Cognisance, aptitude, conductance, capacity, fluidity (of mana through body)
 })
 // const existingChapters = ref([])
+
+onBeforeMount(() => {
+  navigationStore.toggleTopNav()
+})
 
 async function parseJsonFile () {
   const fileInput = document.getElementById('jsonChapterFile')
@@ -261,7 +274,7 @@ const logEntries = async (index = 0) => {
 //     })
 // }
 
-async function createChapter () {
+async function importChapter () {
   chapter.value = 'Chapter ' + chapterNumber.value
   await axios.get('api/v1/get-book/1/').then(response => {
     const formData = {
